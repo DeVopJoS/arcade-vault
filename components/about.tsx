@@ -1,7 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { useReveal } from "@/lib/use-reveal";
+import { sendContactMessage, type ContactResult } from "@/app/acerca/actions";
+
+const ERROR_TEXT: Record<
+  Extract<ContactResult, { ok: false }>["error"],
+  string
+> = {
+  invalid: "REVISA LOS CAMPOS E INTENTA DE NUEVO",
+  rate_limited: "DEMASIADOS ENVÍOS, INTENTA MÁS TARDE",
+  send_failed: "NO SE PUDO ENVIAR, INTENTA MÁS TARDE",
+};
 
 type HighlightKind = "HEART" | "BROWSER" | "PLANT";
 
@@ -69,15 +79,36 @@ export function About() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [sent, setSent] = useState<string | null>(null);
   const [shake, setShake] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 400);
+  };
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (pending) return;
     if (!form.name.trim() || !form.email.trim() || !form.msg.trim()) {
-      setShake(true);
-      setTimeout(() => setShake(false), 400);
+      triggerShake();
       return;
     }
-    setSent(form.name.trim());
+    setError(null);
+    startTransition(async () => {
+      let result: ContactResult;
+      try {
+        result = await sendContactMessage(form);
+      } catch {
+        result = { ok: false, error: "send_failed" };
+      }
+      if (result.ok) {
+        setSent(result.name);
+      } else {
+        setError(ERROR_TEXT[result.error]);
+        triggerShake();
+      }
+    });
   };
 
   return (
@@ -175,12 +206,29 @@ export function About() {
                     placeholder="Cuéntanos qué tienes en mente…"
                   ></textarea>
                 </div>
+                {error && (
+                  <div
+                    role="alert"
+                    className="pixel"
+                    style={{
+                      color: "#ff4d4d",
+                      fontSize: 10,
+                      letterSpacing: "0.1em",
+                      lineHeight: 1.6,
+                      marginBottom: 14,
+                      textShadow: "0 0 6px rgba(255,77,77,0.5)",
+                    }}
+                  >
+                    ✖ {error}
+                  </div>
+                )}
                 <button
                   className="btn xl press"
                   type="submit"
+                  disabled={pending}
                   style={{ width: "100%" }}
                 >
-                  ▶ ENVIAR MENSAJE
+                  {pending ? "ENVIANDO…" : "▶ ENVIAR MENSAJE"}
                 </button>
               </>
             ) : (
@@ -209,6 +257,7 @@ export function About() {
                       type="button"
                       onClick={() => {
                         setSent(null);
+                        setError(null);
                         setForm(EMPTY_FORM);
                       }}
                     >
