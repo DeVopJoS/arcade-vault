@@ -1,6 +1,6 @@
 # SPEC 05 — Juego Asteroides (ROCAS) integrado en el reproductor
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01 (reproductor `GamePlayer`, `saveScore`, datos mock)
 > **Date:** 2026-11-19
 > **Objective:** Portar a TypeScript el juego Asteroids de `references/started-games/02-asteroids/` y montarlo dentro de `GamePlayer` solo para el juego `rocas`, reutilizando el HUD, la pausa y el modal de fin de la plataforma, con controles de teclado y táctiles.
