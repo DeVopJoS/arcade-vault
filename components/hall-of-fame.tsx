@@ -14,6 +14,7 @@ interface LoadResult {
 export function HallOfFame() {
   const [tab, setTab] = useState(GAMES[0].id);
   const [result, setResult] = useState<LoadResult | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     // Evita mostrar datos de una pestaña anterior si la respuesta llega tarde
@@ -33,11 +34,17 @@ export function HallOfFame() {
     return () => {
       cancelled = true;
     };
-  }, [tab]);
+  }, [tab, reloadKey]);
+
+  const retry = () => {
+    setResult(null);
+    setReloadKey((k) => k + 1);
+  };
 
   // Solo vale el resultado de la pestaña activa; si no, estamos cargando
   const current = result?.tab === tab ? result : null;
   const rows = current?.rows ?? [];
+  const activeGame = GAMES.find((g) => g.id === tab) ?? GAMES[0];
   const loading = current === null;
   const error = current?.error ?? null;
 
@@ -69,13 +76,37 @@ export function HallOfFame() {
       )}
 
       {error && (
-        <p
-          className="pixel"
-          role="alert"
-          style={{ fontSize: 10, textAlign: "center", color: "var(--magenta)" }}
-        >
-          ERROR: {error}
-        </p>
+        <div className="hall-state error" role="alert">
+          <p className="pixel msg">NO SE PUDO CARGAR EL SALÓN</p>
+          <p className="hint">{error}</p>
+          <button className="btn magenta" onClick={retry}>
+            REINTENTAR
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && rows.length === 0 && (
+        <>
+          <div className="hall-table" aria-hidden="true">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className={"tr vacant" + (n === 1 ? " slot-1" : "")}>
+                <div className="rk">#{String(n).padStart(2, "0")}</div>
+                <div className="pl">LIBRE</div>
+                <div className="sc">------</div>
+                <div className="dt">--/--/----</div>
+              </div>
+            ))}
+          </div>
+          <div className="hall-state">
+            <p className="pixel msg">AÚN SIN CAMPEONES — SÉ EL PRIMERO</p>
+            <p className="hint">
+              Nadie ha guardado puntaje en {activeGame.title}.
+            </p>
+            <Link href={`/juegos/${tab}/jugar`} className="btn yellow lg">
+              JUGAR
+            </Link>
+          </div>
+        </>
       )}
 
       {!loading && !error && rows.length >= 3 && (
