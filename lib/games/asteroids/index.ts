@@ -232,6 +232,9 @@ export function createAsteroidsGame(
   function draw(): void {
     if (!ctx) return;
     ctx.clearRect(0, 0, W, H);
+    // Brillo neón compartido por todos los trazos
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 8;
     particles.forEach((p) => p.draw(ctx, color));
     asteroids.forEach((a) => a.draw(ctx, color));
     bullets.forEach((b) => b.draw(ctx, color));
