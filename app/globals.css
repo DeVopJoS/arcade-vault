@@ -541,7 +541,7 @@ a { color: inherit; text-decoration: none; }
 }
 .detail-info p { color: var(--ink-dim); font-size: 14px; line-height: 1.7; margin: 0; }
 .stat-strip {
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 1px; background: var(--line);
   border: 1px solid var(--line);
   margin-top: 8px;

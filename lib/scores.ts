@@ -40,6 +40,29 @@ export async function submitScore(input: {
   }
 }
 
+export interface GameStats {
+  plays: number;
+  players: number;
+  best: number;
+}
+
+// Sin filas en `scores` la vista no devuelve el juego: se informa en ceros
+export async function fetchGameStats(gameId: string): Promise<GameStats> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("game_stats")
+    .select("plays, players, best")
+    .eq("game_id", gameId)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return {
+    plays: (data?.plays as number | undefined) ?? 0,
+    players: (data?.players as number | undefined) ?? 0,
+    best: (data?.best as number | undefined) ?? 0,
+  };
+}
+
 export async function fetchLeaderboard(
   gameId: string,
   limit: number = DEFAULT_LIMIT,
