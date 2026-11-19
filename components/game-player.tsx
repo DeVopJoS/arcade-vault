@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/session-provider";
+import AsteroidsCanvas, {
+  type AsteroidsCanvasHandle,
+} from "@/components/asteroids-canvas";
 
 export function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
@@ -18,23 +21,41 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saved, setSaved] = useState(false);
   const name = nameInput ?? user?.name ?? "INVITADO";
 
+  // Solo "rocas" tiene juego real; el resto sigue con la simulación
+  const isRocas = game.id === "rocas";
+  const gameRef = useRef<AsteroidsCanvasHandle>(null);
+
   useEffect(() => {
-    if (over || paused) return;
+    if (isRocas || over || paused) return;
     const t = setInterval(
       () => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
       220,
     );
     return () => clearInterval(t);
-  }, [over, paused]);
+  }, [isRocas, over, paused]);
 
   useEffect(() => {
+    if (isRocas) return;
     // Replica tal cual la plantilla (simulación decorativa)
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (score > 0 && score % 2500 < 100) setLevel((l) => l + 1);
-  }, [score]);
+  }, [isRocas, score]);
 
-  const endGame = () => setOver(true);
+  const togglePause = (e: MouseEvent<HTMLButtonElement>) => {
+    // Quita el foco para que Espacio no vuelva a activar el botón
+    e.currentTarget.blur();
+    const next = !paused;
+    setPaused(next);
+    if (next) gameRef.current?.pause();
+    else gameRef.current?.resume();
+  };
+  const endGame = (e: MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    gameRef.current?.pause();
+    setOver(true);
+  };
   const restart = () => {
+    gameRef.current?.restart();
     setScore(0);
     setLives(3);
     setLevel(1);
@@ -67,7 +88,7 @@ export function GamePlayer({ game }: { game: Game }) {
           </div>
         </div>
         <div className="hud-actions">
-          <button className="btn yellow" onClick={() => setPaused((p) => !p)}>
+          <button className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
           </button>
           <button className="btn magenta" onClick={endGame}>
@@ -84,13 +105,26 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          <div className="game-arena">
-            <div className="grid-floor"></div>
-            <div className="enemy e1"></div>
-            <div className="enemy e2"></div>
-            <div className="enemy e3"></div>
-            <div className="player-ship"></div>
-          </div>
+          {isRocas ? (
+            <AsteroidsCanvas
+              ref={gameRef}
+              onScore={setScore}
+              onLives={setLives}
+              onLevel={setLevel}
+              onGameOver={(finalScore) => {
+                setScore(finalScore);
+                setOver(true);
+              }}
+            />
+          ) : (
+            <div className="game-arena">
+              <div className="grid-floor"></div>
+              <div className="enemy e1"></div>
+              <div className="enemy e2"></div>
+              <div className="enemy e3"></div>
+              <div className="player-ship"></div>
+            </div>
+          )}
           {paused && (
             <div
               className="crt-content"
@@ -154,7 +188,10 @@ export function GamePlayer({ game }: { game: Game }) {
               <button className="btn" onClick={restart}>
                 JUGAR DE NUEVO
               </button>
-              <button className="btn magenta" onClick={() => router.push("/juegos")}>
+              <button
+                className="btn magenta"
+                onClick={() => router.push("/juegos")}
+              >
                 VOLVER AL VAULT
               </button>
             </div>
