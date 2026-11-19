@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/session-provider";
+import { submitScore } from "@/lib/scores";
 import AsteroidsCanvas, {
   type AsteroidsCanvasHandle,
 } from "@/components/asteroids-canvas";
@@ -19,6 +20,8 @@ export function GamePlayer({ game }: { game: Game }) {
   // null = sin edición manual: usa el nombre de la sesión (hidratada tras el mount)
   const [nameInput, setNameInput] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const name = nameInput ?? user?.name ?? "INVITADO";
 
   // Solo "rocas" tiene juego real; el resto sigue con la simulación
@@ -62,6 +65,27 @@ export function GamePlayer({ game }: { game: Game }) {
     setPaused(false);
     setOver(false);
     setSaved(false);
+    setSaving(false);
+    setSaveError(null);
+  };
+
+  const handleSave = async () => {
+    if (saving || saved) return;
+    if (!name.trim()) {
+      setSaveError("ESCRIBE TUS INICIALES");
+      return;
+    }
+    setSaving(true);
+    setSaveError(null);
+    const res = await submitScore({ gameId: game.id, name, score });
+    setSaving(false);
+    if (res.ok) {
+      // Respaldo local de SPEC 01 (sin cambios)
+      saveScore({ game: game.id, score, name });
+      setSaved(true);
+    } else {
+      setSaveError(`ERROR: ${res.message}`);
+    }
   };
 
   return (
@@ -173,16 +197,23 @@ export function GamePlayer({ game }: { game: Game }) {
                 />
                 <button
                   className="btn yellow"
-                  onClick={() => {
-                    saveScore({ game: game.id, score, name });
-                    setSaved(true);
-                  }}
+                  disabled={saving}
+                  onClick={handleSave}
                 >
-                  GUARDAR PUNTUACIÓN
+                  {saving ? "GUARDANDO_" : "GUARDAR PUNTUACIÓN"}
                 </button>
               </div>
             ) : (
               <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+            )}
+            {saveError && !saved && (
+              <div
+                className="pixel"
+                role="alert"
+                style={{ fontSize: 10, color: "var(--magenta)", marginTop: 10 }}
+              >
+                {saveError}
+              </div>
             )}
             <div className="actions">
               <button className="btn" onClick={restart}>
