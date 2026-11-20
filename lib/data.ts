@@ -35,18 +35,41 @@ export const GAMES: Game[] = [
     color: "yellow",
     best: 41200,
     plays: "15.6K",
-  }
+  },
+  {
+    id: "caida",
+    title: "CAÍDA",
+    short: "Encaja bloques antes de que toquen el techo.",
+    long: "Ocho piezas caen sin pausa sobre un pozo de 10×20. Rota, desliza y completa filas para borrarlas. Cada 10 líneas la caída se acelera.",
+    cat: "PUZZLE",
+    cover: "cover-tetro",
+    color: "magenta",
+    best: 0,
+    plays: "0",
+  },
 ];
 
-export const CATS: ("TODOS" | Category)[] = [
-  "TODOS",
-  "SHOOTER",
-];
+export const CATS: ("TODOS" | Category)[] = ["TODOS", "PUZZLE", "SHOOTER"];
 
 export const PLAYERS: string[] = [
-  "PX_KAI", "NEONFOX", "Z3R0COOL", "M00NRYU", "VAULT_07", "GLITCHA",
-  "ATARI_KID", "CYBER_LU", "MAGENTA88", "SCANLINE", "BIT_LORD", "ARKADYA",
-  "DROID_X", "RGB_QUEEN", "PIXEL_DAD", "RETROVIRA", "VECTORX", "JOY_STK",
+  "PX_KAI",
+  "NEONFOX",
+  "Z3R0COOL",
+  "M00NRYU",
+  "VAULT_07",
+  "GLITCHA",
+  "ATARI_KID",
+  "CYBER_LU",
+  "MAGENTA88",
+  "SCANLINE",
+  "BIT_LORD",
+  "ARKADYA",
+  "DROID_X",
+  "RGB_QUEEN",
+  "PIXEL_DAD",
+  "RETROVIRA",
+  "VECTORX",
+  "JOY_STK",
 ];
 
 export interface ScoreRow {

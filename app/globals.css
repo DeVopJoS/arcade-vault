@@ -420,6 +420,15 @@ a { color: inherit; text-decoration: none; }
   filter: drop-shadow(0 0 8px rgba(0,245,255,0.4));
   image-rendering: pixelated;
 }
+/* SPEC 07 — pozo magenta que enmarca las piezas */
+.cover-tetro::before {
+  content: "";
+  position: absolute;
+  inset: 12% 26% 0 26%;
+  border: 2px solid var(--magenta);
+  border-bottom: 0;
+  box-shadow: 0 0 14px rgba(255,0,110,0.45), inset 0 0 18px rgba(255,0,110,0.18);
+}
 
 .cover-snake { background: linear-gradient(135deg,#003a2a,#0a0a18); }
 .cover-snake::after {
@@ -1309,6 +1318,16 @@ a { color: inherit; text-decoration: none; }
   .touch-rot { width: clamp(52px, 14vw, 72px); aspect-ratio: 1; color: var(--cyan); }
   .touch-thrust { width: clamp(48px, 13vw, 64px); aspect-ratio: 1; color: var(--yellow); }
   .touch-fire { width: clamp(68px, 19vw, 96px); aspect-ratio: 1; color: var(--yellow); }
+
+  /* SPEC 07 — Caída: el pozo es vertical y ocupa el centro de la pantalla 4:3,
+     así que los botones se reducen y quedan en los laterales, semitransparentes */
+  .touch-controls.touch-tetris { padding: 2% 1.5%; }
+  .touch-tetris .touch-cluster { gap: 8px; }
+  .touch-tetris .touch-right { gap: 8px; }
+  .touch-tetris .touch-btn { opacity: 0.8; }
+  .touch-tetris .touch-rot { width: clamp(40px, 10.5vw, 56px); }
+  .touch-tetris .touch-thrust { width: clamp(44px, 12vw, 60px); }
+  .touch-tetris .touch-fire { width: clamp(48px, 13vw, 66px); }
 }
 
 /* SPEC 06 — estados del Salón de la Fama (vacío y error) */

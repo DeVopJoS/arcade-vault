@@ -8,12 +8,9 @@ import {
   type AsteroidsCallbacks,
   type AsteroidsGame,
 } from "@/lib/games/asteroids";
+import type { GameCanvasHandle } from "@/lib/games/registry";
 
-export interface AsteroidsCanvasHandle {
-  pause(): void;
-  resume(): void;
-  restart(): void;
-}
+export type AsteroidsCanvasHandle = GameCanvasHandle;
 
 interface AsteroidsCanvasProps extends AsteroidsCallbacks {
   ref?: Ref<AsteroidsCanvasHandle>;
