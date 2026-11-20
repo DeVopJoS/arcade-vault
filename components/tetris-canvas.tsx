@@ -88,8 +88,7 @@ export default function TetrisCanvas({
           aspectRatio: "4 / 5",
         }}
       />
-      {/* Controles táctiles provisionales (se pulen en el paso 7) */}
-      <div className="touch-controls" aria-hidden="true">
+      <div className="touch-controls touch-tetris" aria-hidden="true">
         <div className="touch-cluster touch-left">
           <TouchButton
             action="left"
