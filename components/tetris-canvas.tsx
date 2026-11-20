@@ -8,12 +8,9 @@ import {
   type TetrisCallbacks,
   type TetrisGame,
 } from "@/lib/games/tetris";
+import type { GameCanvasHandle } from "@/lib/games/registry";
 
-export interface TetrisCanvasHandle {
-  pause(): void;
-  resume(): void;
-  restart(): void;
-}
+export type TetrisCanvasHandle = GameCanvasHandle;
 
 interface TetrisCanvasProps extends TetrisCallbacks {
   ref?: Ref<TetrisCanvasHandle>;

@@ -5,9 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/session-provider";
 import { submitScore } from "@/lib/scores";
-import AsteroidsCanvas, {
-  type AsteroidsCanvasHandle,
-} from "@/components/asteroids-canvas";
+import { GAME_CANVASES, type GameCanvasHandle } from "@/lib/games/registry";
 
 export function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
@@ -24,25 +22,26 @@ export function GamePlayer({ game }: { game: Game }) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const name = nameInput ?? user?.name ?? "INVITADO";
 
-  // Solo "rocas" tiene juego real; el resto sigue con la simulación
-  const isRocas = game.id === "rocas";
-  const gameRef = useRef<AsteroidsCanvasHandle>(null);
+  // Sin entrada en el registro, el juego sigue con la simulación
+  const entry = GAME_CANVASES[game.id];
+  const hasRealGame = entry !== undefined;
+  const gameRef = useRef<GameCanvasHandle>(null);
 
   useEffect(() => {
-    if (isRocas || over || paused) return;
+    if (hasRealGame || over || paused) return;
     const t = setInterval(
       () => setScore((s) => s + Math.floor(10 + Math.random() * 90)),
       220,
     );
     return () => clearInterval(t);
-  }, [isRocas, over, paused]);
+  }, [hasRealGame, over, paused]);
 
   useEffect(() => {
-    if (isRocas) return;
+    if (hasRealGame) return;
     // Replica tal cual la plantilla (simulación decorativa)
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (score > 0 && score % 2500 < 100) setLevel((l) => l + 1);
-  }, [isRocas, score]);
+  }, [hasRealGame, score]);
 
   const togglePause = (e: MouseEvent<HTMLButtonElement>) => {
     // Quita el foco para que Espacio no vuelva a activar el botón
@@ -60,7 +59,7 @@ export function GamePlayer({ game }: { game: Game }) {
   const restart = () => {
     gameRef.current?.restart();
     setScore(0);
-    setLives(3);
+    if (entry?.hasLives ?? true) setLives(3);
     setLevel(1);
     setPaused(false);
     setOver(false);
@@ -102,10 +101,12 @@ export function GamePlayer({ game }: { game: Game }) {
             <div className="l">Puntuación</div>
             <div className="v">{score.toLocaleString("es-ES")}</div>
           </div>
-          <div className="hud-stat lives">
-            <div className="l">Vidas</div>
-            <div className="v">{"♥ ".repeat(lives).trim() || "—"}</div>
-          </div>
+          {(entry?.hasLives ?? true) && (
+            <div className="hud-stat lives">
+              <div className="l">Vidas</div>
+              <div className="v">{"♥ ".repeat(lives).trim() || "—"}</div>
+            </div>
+          )}
           <div className="hud-stat level">
             <div className="l">Nivel</div>
             <div className="v">{String(level).padStart(2, "0")}</div>
@@ -129,8 +130,8 @@ export function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isRocas ? (
-            <AsteroidsCanvas
+          {entry ? (
+            <entry.component
               ref={gameRef}
               onScore={setScore}
               onLives={setLives}
