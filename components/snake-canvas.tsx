@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useImperativeHandle, useRef } from "react";
-import type { CSSProperties, Ref } from "react";
+import type { Ref } from "react";
 import {
   createSnakeGame,
   type SnakeAction,
@@ -16,37 +16,12 @@ interface SnakeCanvasProps extends SnakeCallbacks {
   ref?: Ref<SnakeCanvasHandle>;
 }
 
-// D-pad provisional (se pule en el paso 7): cruz de 4 botones.
-const DPAD: {
-  action: SnakeAction;
-  label: string;
-  path: string;
-  style: CSSProperties;
-}[] = [
-  {
-    action: "up",
-    label: "Arriba",
-    path: "M5 15l7-8 7 8",
-    style: { gridColumn: 2, gridRow: 1 },
-  },
-  {
-    action: "left",
-    label: "Izquierda",
-    path: "M15 5 7 12l8 7",
-    style: { gridColumn: 1, gridRow: 2 },
-  },
-  {
-    action: "down",
-    label: "Abajo",
-    path: "M5 9l7 8 7-8",
-    style: { gridColumn: 2, gridRow: 2 },
-  },
-  {
-    action: "right",
-    label: "Derecha",
-    path: "m9 5 8 7-8 7",
-    style: { gridColumn: 3, gridRow: 2 },
-  },
+// D-pad en cruz; la posición de cada botón vive en CSS (.touch-snake .touch-dp-*).
+const DPAD: { action: SnakeAction; label: string; path: string }[] = [
+  { action: "up", label: "Arriba", path: "M5 15l7-8 7 8" },
+  { action: "left", label: "Izquierda", path: "M15 5 7 12l8 7" },
+  { action: "down", label: "Abajo", path: "M5 9l7 8 7-8" },
+  { action: "right", label: "Derecha", path: "m9 5 8 7-8 7" },
 ];
 
 export default function SnakeCanvas({
@@ -121,24 +96,14 @@ export default function SnakeCanvas({
         }}
       />
       <div className="touch-controls touch-snake" aria-hidden="true">
-        <div
-          className="touch-cluster"
-          style={{
-            marginLeft: "auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(3, auto)",
-            gridTemplateRows: "repeat(2, auto)",
-            gap: 6,
-          }}
-        >
+        <div className="touch-cluster">
           {DPAD.map((b) => (
             <button
               key={b.action}
               type="button"
               tabIndex={-1}
               aria-label={b.label}
-              className="touch-btn touch-rot"
-              style={b.style}
+              className={`touch-btn touch-rot touch-dp-${b.action}`}
               onPointerDown={(e) => {
                 e.preventDefault();
                 setInput(b.action, true);
