@@ -47,9 +47,25 @@ export const GAMES: Game[] = [
     best: 0,
     plays: "0",
   },
+  {
+    id: "bloque-buster",
+    title: "BLOQUE BUSTER",
+    short: "Rompe la muralla de neón con una sola pelota.",
+    long: "Mueve la paleta, mantén la pelota en juego y derriba cada bloque. Cinco niveles con muros distintos y una pelota cada vez más veloz. Tienes tres vidas.",
+    cat: "ARCADE",
+    cover: "cover-bricks",
+    color: "cyan",
+    best: 0,
+    plays: "0",
+  },
 ];
 
-export const CATS: ("TODOS" | Category)[] = ["TODOS", "PUZZLE", "SHOOTER"];
+export const CATS: ("TODOS" | Category)[] = [
+  "TODOS",
+  "ARCADE",
+  "PUZZLE",
+  "SHOOTER",
+];
 
 export const PLAYERS: string[] = [
   "PX_KAI",
