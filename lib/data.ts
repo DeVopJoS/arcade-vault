@@ -58,6 +58,17 @@ export const GAMES: Game[] = [
     best: 0,
     plays: "0",
   },
+  {
+    id: "serpentina",
+    title: "SERPENTINA",
+    short: "Come, crece y no te muerdas la cola.",
+    long: "Guía a la serpiente por la rejilla, devora frutas y crece sin chocar con las paredes ni contigo misma. Cada cinco frutas el ritmo se acelera.",
+    cat: "ARCADE",
+    cover: "cover-snake",
+    color: "green",
+    best: 0,
+    plays: "0",
+  },
 ];
 
 export const CATS: ("TODOS" | Category)[] = [
