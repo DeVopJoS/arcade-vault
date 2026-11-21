@@ -396,12 +396,24 @@ a { color: inherit; text-decoration: none; }
 /* ===== Cover art generators (pure CSS) ===== */
 .cover-bg { position: absolute; inset: 0; }
 
-.cover-bricks { background:
-  repeating-linear-gradient(90deg, #ff006e 0 32px, #ffae00 32px 64px, #00f5ff 64px 96px, #00ff88 96px 128px) 0 0/100% 32px,
-  #15151f; }
+/* SPEC 08 — Bloque Buster: muralla neón, pelota y paleta */
+.cover-bricks { background: radial-gradient(circle at 50% 100%, #003a44, #0a0a18 70%); }
 .cover-bricks::after {
+  content: ""; position: absolute;
+  inset: 12% 10% 46% 10%;
+  background:
+    repeating-linear-gradient(90deg, #ff3b30 0 calc(100% / 6 - 4px), transparent 0 calc(100% / 6)) 0 0 / 100% 20% no-repeat,
+    repeating-linear-gradient(90deg, #f5ff00 0 calc(100% / 6 - 4px), transparent 0 calc(100% / 6)) 0 33% / 100% 20% no-repeat,
+    repeating-linear-gradient(90deg, #00f5ff 0 calc(100% / 6 - 4px), transparent 0 calc(100% / 6)) 0 66% / 100% 20% no-repeat,
+    repeating-linear-gradient(90deg, #00ff88 0 calc(100% / 6 - 4px), transparent 0 calc(100% / 6)) 0 100% / 100% 20% no-repeat;
+  filter: drop-shadow(0 0 6px rgba(0,245,255,0.35));
+}
+.cover-bricks::before {
   content: ""; position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg, transparent 0 32px, rgba(0,0,0,0.4) 32px 33px);
+  background:
+    radial-gradient(circle at 62% 72%, #fff 0 5px, transparent 6px),
+    linear-gradient(var(--cyan), var(--cyan)) 50% 90% / 32% 7px no-repeat;
+  filter: drop-shadow(0 0 8px var(--cyan));
 }
 
 .cover-tetro { background: radial-gradient(circle at 50% 100%, #2a004a, #0a0a18); }
@@ -1328,6 +1340,12 @@ a { color: inherit; text-decoration: none; }
   .touch-tetris .touch-rot { width: clamp(40px, 10.5vw, 56px); }
   .touch-tetris .touch-thrust { width: clamp(44px, 12vw, 60px); }
   .touch-tetris .touch-fire { width: clamp(48px, 13vw, 66px); }
+
+  /* SPEC 08 — Bloque Buster: el control principal es arrastrar sobre el canvas;
+     los botones son un apoyo discreto en las esquinas */
+  .touch-controls.touch-arkanoid { padding: 1.5% 2%; }
+  .touch-arkanoid .touch-btn { opacity: 0.55; }
+  .touch-arkanoid .touch-rot { width: clamp(40px, 10vw, 54px); }
 }
 
 /* SPEC 06 — estados del Salón de la Fama (vacío y error) */

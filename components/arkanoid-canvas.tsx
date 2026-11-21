@@ -87,7 +87,7 @@ export default function ArkanoidCanvas({
           touchAction: "none",
         }}
       />
-      <div className="touch-controls" aria-hidden="true">
+      <div className="touch-controls touch-arkanoid" aria-hidden="true">
         <div className="touch-cluster touch-left">
           <TouchButton
             action="left"
