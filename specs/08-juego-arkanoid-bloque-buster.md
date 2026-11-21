@@ -1,6 +1,6 @@
 # SPEC 08 — Juego Arkanoid (BLOQUE BUSTER) integrado en el reproductor con leaderboard
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01 (`GamePlayer`, datos), SPEC 05 (patrón de juego en canvas), SPEC 06 (leaderboard Supabase), SPEC 07 (registro `lib/games/registry.ts`)
 > **Date:** 2026-11-20
 > **Objective:** Portar a TypeScript el Arkanoid de `references/started-games/04-arkanoid/`, montarlo en `GamePlayer` vía el registro (`bloque-buster`) y que su puntaje llegue al Salón de la Fama.
