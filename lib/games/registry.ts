@@ -1,6 +1,7 @@
 import type { ComponentType, Ref } from "react";
 import ArkanoidCanvas from "@/components/arkanoid-canvas";
 import AsteroidsCanvas from "@/components/asteroids-canvas";
+import SnakeCanvas from "@/components/snake-canvas";
 import TetrisCanvas from "@/components/tetris-canvas";
 
 export interface GameCanvasHandle {
@@ -27,4 +28,5 @@ export const GAME_CANVASES: Record<string, GameEntry> = {
   rocas: { component: AsteroidsCanvas, hasLives: true },
   caida: { component: TetrisCanvas, hasLives: false },
   "bloque-buster": { component: ArkanoidCanvas, hasLives: true },
+  serpentina: { component: SnakeCanvas, hasLives: false },
 };
