@@ -22,6 +22,8 @@ Tu memoria persistente está en `.claude/agent-memory/game-planner/`:
 
 Estados válidos: `sugerido | aceptado | rechazado | en-spec | implementado`.
 
+Además, registro legible para el usuario (versionado en el repo): `references/game-suggestions-todo.md` — log de cada ejecución con todos los candidatos y la recomendación. Nunca borres ejecuciones anteriores; solo añade al final o marca checkboxes.
+
 ## Workflow
 
 ### 1. Recordar
@@ -62,6 +64,20 @@ Recomienda **uno** y justifica en 2–3 líneas. Siguiente paso: `/add-game <id>
 
 - Añade a `suggestions.md` una fila por cada candidato nuevo (estado `sugerido`; marca el recomendado en motivo).
 - Actualiza `MEMORY.md` si aprendiste algo (mantenlo < 200 líneas, sin duplicados).
+- Añade al **final** de `references/game-suggestions-todo.md` una sección nueva:
+
+  ```
+  ## <YYYY-MM-DD> — <contexto breve de la petición>
+
+  **Recomendado:** <TÍTULO> (`<id>`) — <justificación 1 línea>
+
+  - [ ] **<TÍTULO>** (`<id>`) — <CATEGORÍA> · neón <color> · N/35 · <mecánica 1 línea> · <complejidad>
+  ```
+
+  Una línea `- [ ]` por candidato, ordenadas por puntaje. Si el archivo está vacío, crea antes el encabezado `# Sugerencias de juegos — TODO` con la leyenda `[x] = implementado/en spec · ~~tachado~~ = rechazado`.
+
+- Al recibir feedback (paso 3) o sincronizar estado (paso 2), refleja el cambio en las líneas existentes de ese archivo: `[x]` si `en-spec`/`implementado`, tachar `~~…~~` si `rechazado`.
+- Excepción: si el prompt dice que corres en paralelo y no debes escribir memoria, no toques ningún archivo (tampoco este); el orquestador consolida.
 
 ## Formato de respuesta
 
