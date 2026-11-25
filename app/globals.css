@@ -1075,6 +1075,65 @@ a {
   gap: 10px;
 }
 
+/* Selector de skin: cartuchos con una mini serpiente en la paleta de cada skin */
+.skin-opts {
+  display: flex;
+  border: 1px solid var(--line);
+}
+.skin-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font-family: var(--pixel);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.skin-opt + .skin-opt {
+  border-left: 1px solid var(--line);
+}
+.skin-opt:hover {
+  color: var(--ink-dim);
+}
+.skin-opt:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -2px;
+}
+.skin-opt[aria-pressed="true"] {
+  color: var(--cyan);
+  background: rgba(0, 245, 255, 0.08);
+  text-shadow: 0 0 6px rgba(0, 245, 255, 0.5);
+}
+.skin-sw {
+  display: inline-flex;
+  gap: 1px;
+  padding: 2px;
+  background: var(--sw-bg);
+  outline: 1px solid var(--ink-faint);
+  opacity: 0.45;
+}
+.skin-sw i {
+  width: 5px;
+  height: 5px;
+  background: var(--sw-body);
+}
+.skin-sw i:last-child {
+  background: var(--sw-head);
+}
+.skin-opt[aria-pressed="true"] .skin-sw {
+  opacity: 1;
+  outline-color: var(--sw-body);
+}
+@media (max-width: 520px) {
+  .skin-opt {
+    padding: 7px 8px;
+  }
+}
+
 .crt {
   position: relative;
   border-radius: 28px;

@@ -14,6 +14,8 @@ export type SnakeCanvasHandle = GameCanvasHandle;
 
 interface SnakeCanvasProps extends SnakeCallbacks {
   ref?: Ref<SnakeCanvasHandle>;
+  /** Id de skin (clasico | neon | retro); inválida → DEFAULT_SKIN. */
+  skin?: string;
 }
 
 // D-pad en cruz; la posición de cada botón vive en CSS (.touch-snake .touch-dp-*).
@@ -30,9 +32,12 @@ export default function SnakeCanvas({
   onLives,
   onLevel,
   onGameOver,
+  skin,
 }: SnakeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<SnakeGame | null>(null);
+  // Skin inicial para crear el motor sin recrearlo al cambiarla.
+  const skinRef = useRef(skin);
 
   // Últimos callbacks: el juego no se recrea si el padre cambia las funciones
   const callbacksRef = useRef<SnakeCallbacks>({
@@ -49,10 +54,6 @@ export default function SnakeCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // El canvas no entiende var(--green): se resuelve a su valor real
-    const color =
-      getComputedStyle(canvas).getPropertyValue("--green").trim() || "#00ff88";
-
     const game = createSnakeGame(
       canvas,
       {
@@ -61,7 +62,7 @@ export default function SnakeCanvas({
         onLevel: (v) => callbacksRef.current.onLevel(v),
         onGameOver: (v) => callbacksRef.current.onGameOver(v),
       },
-      { color },
+      { skin: skinRef.current },
     );
     gameRef.current = game;
     game.start();
@@ -71,6 +72,12 @@ export default function SnakeCanvas({
       gameRef.current = null;
     };
   }, []);
+
+  // Cambio de skin en caliente: solo redibuja, la partida sigue.
+  useEffect(() => {
+    skinRef.current = skin;
+    gameRef.current?.setSkin(skin ?? "");
+  }, [skin]);
 
   useImperativeHandle(ref, () => ({
     pause: () => gameRef.current?.pause(),

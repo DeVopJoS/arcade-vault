@@ -14,6 +14,8 @@ export type TetrisCanvasHandle = GameCanvasHandle;
 
 interface TetrisCanvasProps extends TetrisCallbacks {
   ref?: Ref<TetrisCanvasHandle>;
+  /** Id de skin (clasico | neon | retro); inválida → DEFAULT_SKIN. */
+  skin?: string;
 }
 
 export default function TetrisCanvas({
@@ -22,9 +24,12 @@ export default function TetrisCanvas({
   onLives,
   onLevel,
   onGameOver,
+  skin,
 }: TetrisCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<TetrisGame | null>(null);
+  // Skin inicial para crear el motor sin recrearlo al cambiarla.
+  const skinRef = useRef(skin);
 
   // Últimos callbacks: el juego no se recrea si el padre cambia las funciones
   const callbacksRef = useRef<TetrisCallbacks>({
@@ -41,11 +46,6 @@ export default function TetrisCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // El canvas no entiende var(--magenta): se resuelve a su valor real
-    const color =
-      getComputedStyle(canvas).getPropertyValue("--magenta").trim() ||
-      "#ff006e";
-
     const game = createTetrisGame(
       canvas,
       {
@@ -54,7 +54,7 @@ export default function TetrisCanvas({
         onLevel: (v) => callbacksRef.current.onLevel(v),
         onGameOver: (v) => callbacksRef.current.onGameOver(v),
       },
-      { color },
+      { skin: skinRef.current },
     );
     gameRef.current = game;
     game.start();
@@ -64,6 +64,12 @@ export default function TetrisCanvas({
       gameRef.current = null;
     };
   }, []);
+
+  // Cambio de skin en caliente: solo redibuja, la partida sigue.
+  useEffect(() => {
+    skinRef.current = skin;
+    gameRef.current?.setSkin(skin ?? "");
+  }, [skin]);
 
   useImperativeHandle(ref, () => ({
     pause: () => gameRef.current?.pause(),

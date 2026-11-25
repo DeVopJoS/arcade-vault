@@ -1,7 +1,6 @@
 import { clearLines, collide, createBoard, merge } from "./board";
 import {
   BLOCK,
-  COLORS,
   COLS,
   LINE_SCORES,
   ROWS,
@@ -10,16 +9,24 @@ import {
   type Piece,
 } from "./pieces";
 import {
+  DEFAULT_SKIN,
+  isSkinId,
+  paintBoard,
+  SKINS,
+  type SkinId,
+} from "./skins";
+import {
   HEIGHT,
   NEXT_SIZE,
   NEXT_X,
   NEXT_Y,
-  WELL_H,
-  WELL_W,
   WELL_X,
   WIDTH,
   randomPiece,
 } from "./utils";
+
+export type { SkinId, TetrisSkin } from "./skins";
+export { DEFAULT_SKIN, SKIN_OPTIONS, SKINS } from "./skins";
 
 export interface TetrisCallbacks {
   onScore: (score: number) => void;
@@ -37,6 +44,8 @@ export interface TetrisGame {
   restart(): void; // score 0, nivel 1, tablero vacío
   destroy(): void; // idempotente: cancela rAF, timers y listeners
   setInput(action: TetrisAction, down: boolean): void; // teclado y táctil
+  /** Cambia la skin y redibuja sin reiniciar; key inválida → DEFAULT_SKIN. */
+  setSkin(key: string): void;
 }
 
 type GameState = "playing" | "gameover";
@@ -65,9 +74,10 @@ function dropInterval(level: number): number {
 export function createTetrisGame(
   canvas: HTMLCanvasElement,
   callbacks: TetrisCallbacks,
-  options?: { color?: string },
+  options: { skin?: string } = {},
 ): TetrisGame {
-  const color = options?.color ?? "#fff";
+  let skinId: SkinId = isSkinId(options.skin) ? options.skin : DEFAULT_SKIN;
+  let skin = SKINS[skinId];
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
   const ctx = canvas.getContext("2d");
@@ -278,61 +288,15 @@ export function createTetrisGame(
   }
 
   // ── Draw (sin HUD ni overlay: los pinta la plataforma) ─────────────────────
+  // Todo el color lo pone la skin activa (./skins.ts).
   function drawCell(x: number, y: number, type: number, alpha = 1): void {
     if (!ctx) return;
-    const c = COLORS[type];
-    if (!c) return;
-    const pad = 1.5;
-    ctx.globalAlpha = alpha * 0.55;
-    ctx.fillStyle = c;
-    ctx.fillRect(x + pad, y + pad, BLOCK - pad * 2, BLOCK - pad * 2);
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = c;
-    ctx.lineWidth = 2;
-    ctx.shadowColor = c;
-    ctx.shadowBlur = alpha < 1 ? 0 : 8;
-    ctx.strokeRect(x + pad, y + pad, BLOCK - pad * 2, BLOCK - pad * 2);
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 1;
-  }
-
-  function drawWell(): void {
-    if (!ctx) return;
-    // Cuadrícula
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = 0.12;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let c = 1; c < COLS; c++) {
-      ctx.moveTo(WELL_X + c * BLOCK, 0);
-      ctx.lineTo(WELL_X + c * BLOCK, WELL_H);
-    }
-    for (let r = 1; r < ROWS; r++) {
-      ctx.moveTo(WELL_X, r * BLOCK);
-      ctx.lineTo(WELL_X + WELL_W, r * BLOCK);
-    }
-    ctx.stroke();
-    // Marco
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = 2;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 8;
-    ctx.strokeRect(WELL_X, 0, WELL_W, WELL_H);
-    ctx.shadowBlur = 0;
+    skin.drawBlock(ctx, x, y, type, BLOCK, alpha);
   }
 
   function drawNext(): void {
     if (!ctx || !next) return;
-    ctx.fillStyle = color;
-    ctx.font = "12px monospace";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "alphabetic";
-    ctx.fillText("SIGUIENTE", NEXT_X, NEXT_Y - 12);
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = 0.4;
-    ctx.lineWidth = 1;
-    ctx.strokeRect(NEXT_X, NEXT_Y, NEXT_SIZE, NEXT_SIZE);
-    ctx.globalAlpha = 1;
+    skin.drawNextPanel(ctx, "SIGUIENTE", NEXT_X, NEXT_Y, NEXT_SIZE);
 
     // Centrar la forma (solo celdas ocupadas) dentro del panel 4×4
     const { shape, type } = next;
@@ -362,8 +326,8 @@ export function createTetrisGame(
 
   function draw(): void {
     if (!ctx) return;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    drawWell();
+    paintBoard(ctx, skin);
+    skin.drawWell(ctx);
 
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
@@ -474,5 +438,13 @@ export function createTetrisGame(
       clearInput();
     },
     setInput,
+    setSkin(key) {
+      const nextId = isSkinId(key) ? key : DEFAULT_SKIN;
+      if (nextId === skinId) return;
+      skinId = nextId;
+      skin = SKINS[nextId];
+      // Solo render: score/nivel/estado intactos. Redibuja aunque esté en pausa.
+      if (listening && !destroyed) draw();
+    },
   };
 }

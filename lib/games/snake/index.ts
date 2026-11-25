@@ -19,6 +19,13 @@ import {
   type Particle,
   type Snake,
 } from "./entities";
+import {
+  DEFAULT_SKIN,
+  isSkinId,
+  paintBoard,
+  SKINS,
+  type SkinId,
+} from "./skins";
 import { FRUIT_SHEET } from "./sprites";
 import {
   FRUIT_SCORE,
@@ -48,7 +55,12 @@ export interface SnakeGame {
   restart(): void;
   destroy(): void;
   setInput(action: SnakeAction, down: boolean): void;
+  /** Cambia la skin y redibuja sin reiniciar; key inválida → DEFAULT_SKIN. */
+  setSkin(key: string): void;
 }
+
+export type { SkinId } from "./skins";
+export { DEFAULT_SKIN, SKIN_OPTIONS, SKINS } from "./skins";
 
 const KEY_TO_DIR: Record<string, Direction> = {
   ArrowUp: "up",
@@ -69,9 +81,8 @@ const ARROW_KEYS = new Set(["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]);
 export function createSnakeGame(
   canvas: HTMLCanvasElement,
   callbacks: SnakeCallbacks,
-  options: { color?: string; spriteUrl?: string } = {},
+  options: { skin?: string; spriteUrl?: string } = {},
 ): SnakeGame {
-  const color = options.color || "#00ff88";
   const spriteUrl = options.spriteUrl || FRUIT_SHEET;
   const ctx = canvas.getContext("2d");
   canvas.width = WIDTH;
@@ -83,6 +94,8 @@ export function createSnakeGame(
   let eatEffects: EatEffect[] = [];
   let particles: Particle[] = [];
   let img: HTMLImageElement | null = null;
+  let skinId: SkinId = isSkinId(options.skin) ? options.skin : DEFAULT_SKIN;
+  let skin = SKINS[skinId];
 
   let score = 0;
   let level = 1;
@@ -193,11 +206,11 @@ export function createSnakeGame(
 
   function draw() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    drawGrid(ctx, color);
+    paintBoard(ctx, skin);
+    drawGrid(ctx, skin);
 
-    if (fruit) drawFruit(ctx, img, fruit);
-    for (const e of eatEffects) drawEatEffect(ctx, img, e);
+    if (fruit) drawFruit(ctx, skin, img, fruit);
+    for (const e of eatEffects) drawEatEffect(ctx, skin, img, e);
 
     const dying = deathAge !== null;
     const progress = dying ? 1 : accumulator / stepIntervalFor(fruitsEaten);
@@ -207,8 +220,8 @@ export function createSnakeGame(
       deathAge === null
         ? true
         : Math.floor((deathAge / DEATH_MS) * 6) % 2 === 1;
-    drawSnake(ctx, snake, color, progress, pulse, visible);
-    drawParticles(ctx, particles, color);
+    drawSnake(ctx, skin, snake, progress, pulse, visible);
+    drawParticles(ctx, skin, particles);
   }
 
   // ---------- Loop ----------
@@ -339,6 +352,14 @@ export function createSnakeGame(
     setInput(action, down) {
       if (!down) return; // solo down=true gira
       turn(action);
+    },
+    setSkin(key) {
+      const next = isSkinId(key) ? key : DEFAULT_SKIN;
+      if (next === skinId) return;
+      skinId = next;
+      skin = SKINS[next];
+      // Solo render: score/nivel/estado intactos. Redibuja aunque esté en pausa.
+      if (started && !destroyed) draw();
     },
   };
 }

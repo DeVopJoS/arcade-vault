@@ -1,3 +1,4 @@
+import type { AsteroidsSkin } from "./skins";
 import { H, W, rand, randInt, wrap } from "./utils";
 
 export interface ShipInput {
@@ -31,11 +32,8 @@ export class Bullet {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw(ctx: CanvasRenderingContext2D, color: string): void {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-    ctx.fill();
+  draw(ctx: CanvasRenderingContext2D, skin: AsteroidsSkin): void {
+    skin.drawBullet(ctx, this.x, this.y, this.radius);
   }
 }
 
@@ -92,20 +90,8 @@ export class Asteroid {
     ];
   }
 
-  draw(ctx: CanvasRenderingContext2D, color: string): void {
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.rot);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = "round";
-    ctx.beginPath();
-    ctx.moveTo(this.verts[0][0], this.verts[0][1]);
-    for (let i = 1; i < this.verts.length; i++)
-      ctx.lineTo(this.verts[i][0], this.verts[i][1]);
-    ctx.closePath();
-    ctx.stroke();
-    ctx.restore();
+  draw(ctx: CanvasRenderingContext2D, skin: AsteroidsSkin): void {
+    skin.drawRock(ctx, this.x, this.y, this.rot, this.verts);
   }
 }
 
@@ -167,39 +153,14 @@ export class Ship {
     return [new Bullet(ox, oy, this.angle)];
   }
 
-  draw(ctx: CanvasRenderingContext2D, color: string): void {
+  draw(ctx: CanvasRenderingContext2D, skin: AsteroidsSkin): void {
     if (this.dead) return;
     // Parpadeo durante invencibilidad de reaparición
     if (this.invincible > 0 && Math.floor(this.invincible * 8) % 2 === 0)
       return;
-
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.rotate(this.angle);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = "round";
-
-    // Silueta clásica: triángulo con muesca trasera
-    ctx.beginPath();
-    ctx.moveTo(20, 0); // nariz
-    ctx.lineTo(-12, -9); // ala izquierda
-    ctx.lineTo(-7, 0); // muesca trasera
-    ctx.lineTo(-12, 9); // ala derecha
-    ctx.closePath();
-    ctx.stroke();
-
-    // Llama del propulsor
-    if (this.thrusting && Math.random() > 0.35) {
-      ctx.beginPath();
-      ctx.moveTo(-8, -4);
-      ctx.lineTo(-8 - rand(6, 14), 0);
-      ctx.lineTo(-8, 4);
-      ctx.strokeStyle = "rgba(255, 130, 0, 0.85)";
-      ctx.stroke();
-    }
-
-    ctx.restore();
+    // Llama del propulsor (parpadeo aleatorio, largo variable)
+    const flame = this.thrusting && Math.random() > 0.35 ? rand(6, 14) : 0;
+    skin.drawShip(ctx, this.x, this.y, this.angle, flame);
   }
 }
 
@@ -231,14 +192,14 @@ export class Particle {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw(ctx: CanvasRenderingContext2D, color: string): void {
-    ctx.globalAlpha = Math.max(this.ttl / this.life, 0);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
-    ctx.lineTo(this.x - this.vx * 0.05, this.y - this.vy * 0.05);
-    ctx.stroke();
-    ctx.globalAlpha = 1;
+  draw(ctx: CanvasRenderingContext2D, skin: AsteroidsSkin): void {
+    skin.drawParticle(
+      ctx,
+      this.x,
+      this.y,
+      this.x - this.vx * 0.05,
+      this.y - this.vy * 0.05,
+      Math.max(this.ttl / this.life, 0),
+    );
   }
 }

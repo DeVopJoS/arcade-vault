@@ -1,17 +1,15 @@
+import type { SnakeSkin } from "./skins";
 import { FRUITS, type FruitName, type SpriteRect } from "./sprites";
 import {
   CELL,
   COLS,
   DIR_VECTORS,
-  HEIGHT,
   ROWS,
-  WIDTH,
   clamp,
   easeOutBack,
   easeOutCubic,
   isOpposite,
   lerp,
-  withAlpha,
   type Direction,
 } from "./utils";
 
@@ -70,7 +68,6 @@ const FRUIT_H = 34;
 const FRUIT_MAX_W = 40;
 const PARTICLE_COUNT = 6;
 const PARTICLE_LIFE = 400;
-const FALLBACK_COLOR = "#ff006e"; // magenta
 
 // ── Estado y lógica pura ────────────────────────────────────────────────────
 
@@ -204,23 +201,10 @@ export function updateParticles(particles: Particle[], dt: number): Particle[] {
   return alive;
 }
 
-// ── Dibujo ──────────────────────────────────────────────────────────────────
+// ── Dibujo (delegado en la skin activa) ─────────────────────────────────────
 
-export function drawGrid(ctx: CanvasRenderingContext2D, color: string): void {
-  ctx.save();
-  ctx.strokeStyle = withAlpha(color, 0.06);
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  for (let x = 0; x <= COLS; x++) {
-    ctx.moveTo(x * CELL + 0.5, 0);
-    ctx.lineTo(x * CELL + 0.5, HEIGHT);
-  }
-  for (let y = 0; y <= ROWS; y++) {
-    ctx.moveTo(0, y * CELL + 0.5);
-    ctx.lineTo(WIDTH, y * CELL + 0.5);
-  }
-  ctx.stroke();
-  ctx.restore();
+export function drawGrid(ctx: CanvasRenderingContext2D, skin: SnakeSkin): void {
+  skin.drawGrid(ctx);
 }
 
 function fitSprite(rect: SpriteRect): { w: number; h: number } {
@@ -236,6 +220,7 @@ function fitSprite(rect: SpriteRect): { w: number; h: number } {
 
 function drawSprite(
   ctx: CanvasRenderingContext2D,
+  skin: SnakeSkin,
   img: HTMLImageElement | null,
   kind: FruitName,
   cx: number,
@@ -244,34 +229,20 @@ function drawSprite(
   alpha: number,
 ): void {
   if (scale <= 0 || alpha <= 0) return;
+  const ready = img && img.complete && img.naturalWidth > 0 ? img : null;
+  const r = FRUITS[kind];
+  const { w, h } = fitSprite(r);
   ctx.save();
-  ctx.globalAlpha = clamp(alpha, 0, 1);
   ctx.translate(cx, cy);
   ctx.scale(scale, scale);
-  if (img && img.complete && img.naturalWidth > 0) {
-    const r = FRUITS[kind];
-    const { w, h } = fitSprite(r);
-    ctx.imageSmoothingEnabled = true;
-    ctx.shadowColor = "rgba(255, 255, 255, 0.55)";
-    ctx.shadowBlur = 10;
-    ctx.drawImage(img, r.x, r.y, r.w, r.h, -w / 2, -h / 2, w, h);
-  } else {
-    ctx.fillStyle = withAlpha(FALLBACK_COLOR, 0.35);
-    ctx.strokeStyle = FALLBACK_COLOR;
-    ctx.lineWidth = 2;
-    ctx.shadowColor = FALLBACK_COLOR;
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.arc(0, 0, 13, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-  }
+  skin.drawFruit(ctx, ready, r, w, h, clamp(alpha, 0, 1));
   ctx.restore();
 }
 
 /** Fruta con aparición (escala 0→1, ease-out-back) y flotado senoidal. */
 export function drawFruit(
   ctx: CanvasRenderingContext2D,
+  skin: SnakeSkin,
   img: HTMLImageElement | null,
   fruit: Fruit,
 ): void {
@@ -279,67 +250,40 @@ export function drawFruit(
   const scale = easeOutBack(fruit.age / SPAWN_MS);
   const bob =
     Math.sin((fruit.age / FLOAT_PERIOD_MS) * Math.PI * 2) * FLOAT_AMPLITUDE;
-  drawSprite(ctx, img, fruit.kind, x, y + bob, scale, 1);
+  drawSprite(ctx, skin, img, fruit.kind, x, y + bob, scale, 1);
 }
 
 /** Fruta comida: se encoge y sube mientras se desvanece (250 ms). */
 export function drawEatEffect(
   ctx: CanvasRenderingContext2D,
+  skin: SnakeSkin,
   img: HTMLImageElement | null,
   fx: EatEffect,
 ): void {
   const t = clamp(fx.age / EAT_MS, 0, 1);
   const e = easeOutCubic(t);
-  drawSprite(ctx, img, fx.kind, fx.x, fx.y - 18 * e, 1 - e, 1 - t);
+  drawSprite(ctx, skin, img, fx.kind, fx.x, fx.y - 18 * e, 1 - e, 1 - t);
 }
 
 export function drawParticles(
   ctx: CanvasRenderingContext2D,
+  skin: SnakeSkin,
   particles: Particle[],
-  color: string,
 ): void {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 8;
   for (const p of particles) {
-    const k = p.life / p.maxLife;
-    ctx.fillStyle = withAlpha(color, k);
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 1 + 2.5 * k, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
-}
-
-function drawEyes(
-  ctx: CanvasRenderingContext2D,
-  dir: Direction,
-  size: number,
-): void {
-  const v = DIR_VECTORS[dir];
-  const fwd = size * 0.18;
-  const side = size * 0.22;
-  const r = size * 0.09;
-  ctx.fillStyle = "#fff";
-  ctx.shadowBlur = 0;
-  for (const s of [-1, 1]) {
-    const ex = v.dx * fwd + -v.dy * side * s;
-    const ey = v.dy * fwd + v.dx * side * s;
-    ctx.beginPath();
-    ctx.arc(ex, ey, r, 0, Math.PI * 2);
-    ctx.fill();
+    skin.drawParticle(ctx, p.x, p.y, p.life / p.maxLife);
   }
 }
 
 /**
- * Serpiente neón. `progress` (0–1) interpola entre `prev` y `segments`;
+ * Serpiente. `progress` (0–1) interpola entre `prev` y `segments`;
  * `pulse` (0–1, 1 = recién comió) agranda la cabeza hasta 1.15;
  * `visible=false` oculta el cuerpo (parpadeo de muerte).
  */
 export function drawSnake(
   ctx: CanvasRenderingContext2D,
+  skin: SnakeSkin,
   snake: Snake,
-  color: string,
   progress: number,
   pulse: number,
   visible: boolean,
@@ -347,14 +291,6 @@ export function drawSnake(
   if (!visible) return;
   const size = CELL - 6;
   const p = clamp(progress, 0, 1);
-  ctx.save();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = color;
-  ctx.fillStyle = withAlpha(color, 0.25);
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.lineJoin = "round";
-
   for (let i = snake.segments.length - 1; i >= 0; i--) {
     const cur = snake.segments[i];
     const prv = snake.prev[i] ?? cur;
@@ -362,16 +298,12 @@ export function drawSnake(
     const cy = lerp(prv.y, cur.y, p) * CELL + CELL / 2;
     const isHead = i === 0;
     const s = size * (isHead ? 1 + 0.15 * clamp(pulse, 0, 1) : 1);
-    ctx.beginPath();
-    ctx.roundRect(cx - s / 2, cy - s / 2, s, s, 8);
-    ctx.fill();
-    ctx.stroke();
+    skin.drawSegment(ctx, cx, cy, s, isHead);
     if (isHead) {
       ctx.save();
       ctx.translate(cx, cy);
-      drawEyes(ctx, snake.dir, s);
+      skin.drawEyes(ctx, snake.dir, s);
       ctx.restore();
     }
   }
-  ctx.restore();
 }

@@ -12,6 +12,19 @@ export const NEXT_X = WELL_X + WELL_W + 20; // 360
 export const NEXT_Y = 60;
 export const NEXT_SIZE = 4 * BLOCK; // 120
 
+/** Traza (sin pintar) las líneas internas de la cuadrícula del pozo. */
+export function traceWellGrid(ctx: CanvasRenderingContext2D): void {
+  ctx.beginPath();
+  for (let c = 1; c < COLS; c++) {
+    ctx.moveTo(WELL_X + c * BLOCK, 0);
+    ctx.lineTo(WELL_X + c * BLOCK, WELL_H);
+  }
+  for (let r = 1; r < ROWS; r++) {
+    ctx.moveTo(WELL_X, r * BLOCK);
+    ctx.lineTo(WELL_X + WELL_W, r * BLOCK);
+  }
+}
+
 /** Pieza aleatoria uniforme entre las 8. Llamar solo tras montar (usa Math.random). */
 export function randomPiece(): Piece {
   const type = Math.floor(Math.random() * PIECE_TYPES) + 1;

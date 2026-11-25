@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/session-provider";
@@ -26,6 +32,32 @@ export function GamePlayer({ game }: { game: Game }) {
   const entry = GAME_CANVASES[game.id];
   const hasRealGame = entry !== undefined;
   const gameRef = useRef<GameCanvasHandle>(null);
+
+  // Skin: default en SSR; la preferencia guardada se aplica tras el mount.
+  const skinKey = `av-skin-${game.id}`;
+  const [skin, setSkin] = useState(entry?.defaultSkin);
+  useEffect(() => {
+    if (!entry?.skins) return;
+    try {
+      const saved = localStorage.getItem(skinKey);
+      if (saved && entry.skins.some((o) => o.id === saved)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSkin(saved);
+      }
+    } catch {
+      // Storage bloqueado: se queda la skin por defecto.
+    }
+  }, [entry, skinKey]);
+  const chooseSkin = (e: MouseEvent<HTMLButtonElement>, id: string) => {
+    // Sin foco: Espacio/flechas siguen siendo del juego
+    e.currentTarget.blur();
+    setSkin(id);
+    try {
+      localStorage.setItem(skinKey, id);
+    } catch {
+      // Sin persistencia: el cambio vale para esta sesión.
+    }
+  };
 
   useEffect(() => {
     if (hasRealGame || over || paused) return;
@@ -112,6 +144,42 @@ export function GamePlayer({ game }: { game: Game }) {
             <div className="v">{String(level).padStart(2, "0")}</div>
           </div>
         </div>
+        {entry?.skins && (
+          <div className="hud-stat skin-picker">
+            <div className="l" id="skin-label">
+              Skin
+            </div>
+            <div
+              className="skin-opts"
+              role="group"
+              aria-labelledby="skin-label"
+            >
+              {entry.skins.map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  className="skin-opt"
+                  aria-pressed={skin === o.id}
+                  onClick={(e) => chooseSkin(e, o.id)}
+                  style={
+                    {
+                      "--sw-bg": o.swatch[0],
+                      "--sw-body": o.swatch[1],
+                      "--sw-head": o.swatch[2],
+                    } as CSSProperties
+                  }
+                >
+                  <span className="skin-sw" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  {o.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="hud-actions">
           <button className="btn yellow" onClick={togglePause}>
             {paused ? "REANUDAR" : "PAUSA"}
@@ -133,6 +201,7 @@ export function GamePlayer({ game }: { game: Game }) {
           {entry ? (
             <entry.component
               ref={gameRef}
+              skin={skin}
               onScore={setScore}
               onLives={setLives}
               onLevel={setLevel}

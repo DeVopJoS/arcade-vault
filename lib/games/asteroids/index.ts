@@ -1,5 +1,12 @@
 import { Asteroid, Bullet, POINTS, Particle, Ship } from "./entities";
-import { H, W, dist, rand } from "./utils";
+import {
+  DEFAULT_SKIN,
+  SKINS,
+  isSkinId,
+  paintBoard,
+  type SkinId,
+} from "./skins";
+import { dist, H, rand, W } from "./utils";
 
 export interface AsteroidsCallbacks {
   onScore: (score: number) => void;
@@ -17,7 +24,12 @@ export interface AsteroidsGame {
   restart(): void; // score 0, 3 vidas, nivel 1
   destroy(): void; // cancela rAF y quita listeners
   setInput(action: AsteroidsAction, down: boolean): void; // táctil
+  /** Cambia la skin y redibuja sin reiniciar; key inválida → DEFAULT_SKIN. */
+  setSkin(key: string): void;
 }
+
+export type { SkinId } from "./skins";
+export { DEFAULT_SKIN, SKIN_OPTIONS, SKINS } from "./skins";
 
 type GameState = "playing" | "dead" | "gameover";
 
@@ -39,9 +51,10 @@ const PREVENT_DEFAULT_KEYS = [
 export function createAsteroidsGame(
   canvas: HTMLCanvasElement,
   callbacks: AsteroidsCallbacks,
-  options?: { color?: string },
+  options: { skin?: string } = {},
 ): AsteroidsGame {
-  const color = options?.color ?? "#fff";
+  let skinId: SkinId = isSkinId(options.skin) ? options.skin : DEFAULT_SKIN;
+  let skin = SKINS[skinId];
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d");
@@ -231,14 +244,11 @@ export function createAsteroidsGame(
   // ── Draw (sin HUD ni overlay: los pinta la plataforma) ─────────────────────
   function draw(): void {
     if (!ctx) return;
-    ctx.clearRect(0, 0, W, H);
-    // Brillo neón compartido por todos los trazos
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 8;
-    particles.forEach((p) => p.draw(ctx, color));
-    asteroids.forEach((a) => a.draw(ctx, color));
-    bullets.forEach((b) => b.draw(ctx, color));
-    ship.draw(ctx, color);
+    paintBoard(ctx, skin);
+    particles.forEach((p) => p.draw(ctx, skin));
+    asteroids.forEach((a) => a.draw(ctx, skin));
+    bullets.forEach((b) => b.draw(ctx, skin));
+    ship.draw(ctx, skin);
   }
 
   // ── Loop ───────────────────────────────────────────────────────────────────
@@ -271,6 +281,7 @@ export function createAsteroidsGame(
   }
 
   let listening = false;
+  let started = false;
 
   return {
     start() {
@@ -280,6 +291,7 @@ export function createAsteroidsGame(
         window.addEventListener("keydown", onKeyDown);
         window.addEventListener("keyup", onKeyUp);
       }
+      started = true;
       initGame();
       draw();
       startLoop();
@@ -309,5 +321,13 @@ export function createAsteroidsGame(
       clearInput();
     },
     setInput,
+    setSkin(key) {
+      const next = isSkinId(key) ? key : DEFAULT_SKIN;
+      if (next === skinId) return;
+      skinId = next;
+      skin = SKINS[next];
+      // Solo render: score/vidas/nivel/estado intactos. Redibuja aunque esté en pausa.
+      if (started && !destroyed) draw();
+    },
   };
 }
