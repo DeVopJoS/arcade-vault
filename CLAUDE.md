@@ -49,3 +49,12 @@ Specs done: 01 MVP screens, 02 home, 03 about+contact (Resend), 04 Supabase conn
 - `/frontend-design`: SIEMPRE usar para diseñar la interfaz de usuario.
 - `/add-game` (`.claude/skills/add-game/`): genera spec `specs/NN-*.md` para un juego nuevo (port desde `references/started-games/` o desde cero) con leaderboard + integración en registry/GamePlayer. Solo escribe la spec; implementar con `/spec-impl`. Refs: `references/integration-checklist.md`, `references/spec-template.md`.
 - Spec workflow: `/spec`, `/spec-impl` (fernando-skills).
+
+## Agents
+
+Subagentes en `.claude/agents/` (ver con `/agents`).
+
+- `game-planner` (`.claude/agents/game-planner.md`): planifica y decide qué juego nuevo encaja en la plataforma. Usar para "¿qué juego agregamos?", evaluar/priorizar ideas o aceptar/rechazar sugerencias previas.
+  - Lee estado real (`references/implemented-games.md`, `lib/data.ts`, registry, `specs/`, `references/started-games/`, Supabase solo SELECT) y propone 2–4 candidatos originales puntuados (/35) + 1 recomendación.
+  - Memoria persistente (`memory: project`) en `.claude/agent-memory/game-planner/`: `MEMORY.md` (preferencias del usuario, catálogo) y `suggestions.md` (registro de ideas con estado `sugerido|aceptado|rechazado|en-spec|implementado`). No repite ideas rechazadas. Commitear la memoria.
+  - No escribe specs ni código. Flujo: `game-planner` → `/add-game <id>` → `/spec-impl`.
