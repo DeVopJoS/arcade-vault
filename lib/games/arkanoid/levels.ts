@@ -20,16 +20,7 @@ export const BLOCK_H = 24;
 export const BLOCKS_ORIGIN_X = (800 - BLOCK_COLS * BLOCK_W) / 2; // 80
 export const BLOCKS_ORIGIN_Y = 80;
 
-// Colores neón (hex) por color de bloque
-export const BLOCK_HEX: Record<BlockColor, string> = {
-  red: "#ff3b30",
-  yellow: "#f5ff00",
-  cyan: "#00f5ff",
-  magenta: "#d400ff",
-  hotpink: "#ff4fa3",
-  green: "#00ff88",
-  gray: "#b8bcc8",
-};
+// Los colores de cada BlockColor viven en skins.ts (por skin).
 
 const ROW_COLORS_1: BlockColor[] = [
   "red",

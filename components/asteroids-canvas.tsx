@@ -14,6 +14,8 @@ export type AsteroidsCanvasHandle = GameCanvasHandle;
 
 interface AsteroidsCanvasProps extends AsteroidsCallbacks {
   ref?: Ref<AsteroidsCanvasHandle>;
+  /** Id de skin (clasico | neon | retro); inválida → DEFAULT_SKIN. */
+  skin?: string;
 }
 
 export default function AsteroidsCanvas({
@@ -22,9 +24,12 @@ export default function AsteroidsCanvas({
   onLives,
   onLevel,
   onGameOver,
+  skin,
 }: AsteroidsCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<AsteroidsGame | null>(null);
+  // Skin inicial para crear el motor sin recrearlo al cambiarla.
+  const skinRef = useRef(skin);
 
   // Últimos callbacks: el juego no se recrea si el padre cambia las funciones
   const callbacksRef = useRef<AsteroidsCallbacks>({
@@ -41,10 +46,6 @@ export default function AsteroidsCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // El canvas no entiende var(--yellow): se resuelve a su valor real
-    const color =
-      getComputedStyle(canvas).getPropertyValue("--yellow").trim() || "#f5ff00";
-
     const game = createAsteroidsGame(
       canvas,
       {
@@ -53,7 +54,7 @@ export default function AsteroidsCanvas({
         onLevel: (v) => callbacksRef.current.onLevel(v),
         onGameOver: (v) => callbacksRef.current.onGameOver(v),
       },
-      { color },
+      { skin: skinRef.current },
     );
     gameRef.current = game;
     game.start();
@@ -63,6 +64,12 @@ export default function AsteroidsCanvas({
       gameRef.current = null;
     };
   }, []);
+
+  // Cambio de skin en caliente: solo redibuja, la partida sigue.
+  useEffect(() => {
+    skinRef.current = skin;
+    gameRef.current?.setSkin(skin ?? "");
+  }, [skin]);
 
   useImperativeHandle(ref, () => ({
     pause: () => gameRef.current?.pause(),

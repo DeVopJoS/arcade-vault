@@ -3,10 +3,6 @@ import {
   createBall,
   createBlocks,
   createPaddle,
-  drawBall,
-  drawBlock,
-  drawExplosion,
-  drawPaddle,
   EXPLOSION_DURATION,
   type Ball,
   type Block,
@@ -14,6 +10,13 @@ import {
   type Paddle,
 } from "./entities";
 import { LEVELS, LEVEL_COUNT } from "./levels";
+import {
+  DEFAULT_SKIN,
+  isSkinId,
+  paintBoard,
+  SKINS,
+  type SkinId,
+} from "./skins";
 import {
   BASE_BALL_VX,
   BASE_BALL_VY,
@@ -44,14 +47,20 @@ export interface ArkanoidGame {
   restart(): void;
   destroy(): void;
   setInput(action: ArkanoidAction, down: boolean): void;
+  /** Cambia la skin y redibuja sin reiniciar; key inválida → DEFAULT_SKIN. */
+  setSkin(key: string): void;
 }
+
+export type { SkinId } from "./skins";
+export { DEFAULT_SKIN, SKIN_OPTIONS, SKINS } from "./skins";
 
 export function createArkanoidGame(
   canvas: HTMLCanvasElement,
   callbacks: ArkanoidCallbacks,
-  options: { color?: string } = {},
+  options: { skin?: string } = {},
 ): ArkanoidGame {
-  const color = options.color || "#00f5ff";
+  let skinId: SkinId = isSkinId(options.skin) ? options.skin : DEFAULT_SKIN;
+  let skin = SKINS[skinId];
   const ctx = canvas.getContext("2d");
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
@@ -222,11 +231,12 @@ export function createArkanoidGame(
 
   function draw() {
     if (!ctx) return;
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    for (const b of blocks) if (b.alive) drawBlock(ctx, b, b.color);
-    for (const e of explosions) drawExplosion(ctx, e);
-    drawPaddle(ctx, paddle, color);
-    drawBall(ctx, ball, color);
+    paintBoard(ctx, skin);
+    for (const b of blocks) if (b.alive) skin.drawBrick(ctx, b, b.color);
+    for (const e of explosions)
+      skin.drawExplosion(ctx, e, e.color, e.elapsed / EXPLOSION_DURATION);
+    skin.drawPaddle(ctx, paddle);
+    skin.drawBall(ctx, ball);
   }
 
   // ---------- Loop ----------
@@ -334,6 +344,14 @@ export function createArkanoidGame(
         return;
       }
       input[action] = down;
+    },
+    setSkin(key) {
+      const next = isSkinId(key) ? key : DEFAULT_SKIN;
+      if (next === skinId) return;
+      skinId = next;
+      skin = SKINS[next];
+      // Solo render: score/vidas/nivel/estado intactos. Redibuja aunque esté en pausa.
+      if (started && !destroyed) draw();
     },
   };
 }

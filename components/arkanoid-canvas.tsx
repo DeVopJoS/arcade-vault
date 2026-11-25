@@ -14,6 +14,8 @@ export type ArkanoidCanvasHandle = GameCanvasHandle;
 
 interface ArkanoidCanvasProps extends ArkanoidCallbacks {
   ref?: Ref<ArkanoidCanvasHandle>;
+  /** Id de skin (clasico | neon | retro); inválida → DEFAULT_SKIN. */
+  skin?: string;
 }
 
 export default function ArkanoidCanvas({
@@ -22,9 +24,12 @@ export default function ArkanoidCanvas({
   onLives,
   onLevel,
   onGameOver,
+  skin,
 }: ArkanoidCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gameRef = useRef<ArkanoidGame | null>(null);
+  // Skin inicial para crear el motor sin recrearlo al cambiarla.
+  const skinRef = useRef(skin);
 
   // Últimos callbacks: el juego no se recrea si el padre cambia las funciones
   const callbacksRef = useRef<ArkanoidCallbacks>({
@@ -41,10 +46,6 @@ export default function ArkanoidCanvas({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // El canvas no entiende var(--cyan): se resuelve a su valor real
-    const color =
-      getComputedStyle(canvas).getPropertyValue("--cyan").trim() || "#00f5ff";
-
     const game = createArkanoidGame(
       canvas,
       {
@@ -53,7 +54,7 @@ export default function ArkanoidCanvas({
         onLevel: (v) => callbacksRef.current.onLevel(v),
         onGameOver: (v) => callbacksRef.current.onGameOver(v),
       },
-      { color },
+      { skin: skinRef.current },
     );
     gameRef.current = game;
     game.start();
@@ -63,6 +64,12 @@ export default function ArkanoidCanvas({
       gameRef.current = null;
     };
   }, []);
+
+  // Cambio de skin en caliente: solo redibuja, la partida sigue.
+  useEffect(() => {
+    skinRef.current = skin;
+    gameRef.current?.setSkin(skin ?? "");
+  }, [skin]);
 
   useImperativeHandle(ref, () => ({
     pause: () => gameRef.current?.pause(),

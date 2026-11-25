@@ -74,6 +74,19 @@ export function swipeToDirection(dx: number, dy: number): Direction | null {
   return dy > 0 ? "down" : "up";
 }
 
+/** Traza (sin pintar) las líneas de la rejilla de celdas en un path nuevo. */
+export function traceGrid(ctx: CanvasRenderingContext2D): void {
+  ctx.beginPath();
+  for (let x = 0; x <= COLS; x++) {
+    ctx.moveTo(x * CELL + 0.5, 0);
+    ctx.lineTo(x * CELL + 0.5, HEIGHT);
+  }
+  for (let y = 0; y <= ROWS; y++) {
+    ctx.moveTo(0, y * CELL + 0.5);
+    ctx.lineTo(WIDTH, y * CELL + 0.5);
+  }
+}
+
 /** Convierte "#rrggbb" / "#rgb" a rgba(). Si no es hex, devuelve el color tal cual. */
 export function withAlpha(color: string, alpha: number): string {
   const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color.trim());

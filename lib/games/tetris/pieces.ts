@@ -61,17 +61,7 @@ export const PIECES: readonly (Shape | null)[] = [
 
 export const PIECE_TYPES = PIECES.length - 1;
 
-export const COLORS: readonly (string | null)[] = [
-  null,
-  "#4dd0e1", // I - cyan
-  "#ffd54f", // O - yellow
-  "#ba68c8", // T - purple
-  "#81c784", // S - green
-  "#e57373", // Z - red
-  "#90caf9", // J - pale blue
-  "#ffb74d", // L - orange
-  "#9e9e9e", // N - tuerca (gris metálico)
-];
+// Colores por tipo de pieza: ver `colors` de cada skin en ./skins.ts.
 
 /** Rotación horaria; devuelve una matriz nueva. */
 export function rotateCW(shape: Shape): Shape {
