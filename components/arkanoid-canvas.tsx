@@ -75,6 +75,10 @@ export default function ArkanoidCanvas({
     pause: () => gameRef.current?.pause(),
     resume: () => gameRef.current?.resume(),
     restart: () => gameRef.current?.restart(),
+    // Gamepad genérico (SPEC 10): solo se reenvían acciones válidas del juego
+    setInput: (action: string, down: boolean) => {
+      if (isArkanoidAction(action)) gameRef.current?.setInput(action, down);
+    },
   }));
 
   const setInput = (action: ArkanoidAction, down: boolean) =>
@@ -154,4 +158,13 @@ function TouchButton({
       </svg>
     </button>
   );
+}
+
+const ARKANOID_ACTIONS: readonly string[] = [
+  "left",
+  "right",
+] satisfies readonly ArkanoidAction[];
+
+function isArkanoidAction(action: string): action is ArkanoidAction {
+  return ARKANOID_ACTIONS.includes(action);
 }

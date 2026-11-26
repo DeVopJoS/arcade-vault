@@ -75,6 +75,10 @@ export default function TetrisCanvas({
     pause: () => gameRef.current?.pause(),
     resume: () => gameRef.current?.resume(),
     restart: () => gameRef.current?.restart(),
+    // Gamepad genérico (SPEC 10): solo se reenvían acciones válidas del juego
+    setInput: (action: string, down: boolean) => {
+      if (isTetrisAction(action)) gameRef.current?.setInput(action, down);
+    },
   }));
 
   const setInput = (action: TetrisAction, down: boolean) =>
@@ -172,4 +176,16 @@ function TouchButton({
       </svg>
     </button>
   );
+}
+
+const TETRIS_ACTIONS: readonly string[] = [
+  "left",
+  "right",
+  "down",
+  "rotate",
+  "drop",
+] satisfies readonly TetrisAction[];
+
+function isTetrisAction(action: string): action is TetrisAction {
+  return TETRIS_ACTIONS.includes(action);
 }

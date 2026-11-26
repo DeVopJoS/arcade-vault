@@ -83,6 +83,10 @@ export default function SnakeCanvas({
     pause: () => gameRef.current?.pause(),
     resume: () => gameRef.current?.resume(),
     restart: () => gameRef.current?.restart(),
+    // Gamepad genérico (SPEC 10): solo se reenvían acciones válidas del juego
+    setInput: (action: string, down: boolean) => {
+      if (isSnakeAction(action)) gameRef.current?.setInput(action, down);
+    },
   }));
 
   const setInput = (action: SnakeAction, down: boolean) =>
@@ -133,4 +137,15 @@ export default function SnakeCanvas({
       </div>
     </>
   );
+}
+
+const SNAKE_ACTIONS: readonly string[] = [
+  "up",
+  "down",
+  "left",
+  "right",
+] satisfies readonly SnakeAction[];
+
+function isSnakeAction(action: string): action is SnakeAction {
+  return SNAKE_ACTIONS.includes(action);
 }

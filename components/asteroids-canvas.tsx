@@ -75,6 +75,10 @@ export default function AsteroidsCanvas({
     pause: () => gameRef.current?.pause(),
     resume: () => gameRef.current?.resume(),
     restart: () => gameRef.current?.restart(),
+    // Gamepad genérico (SPEC 10): solo se reenvían acciones válidas del juego
+    setInput: (action: string, down: boolean) => {
+      if (isAsteroidsAction(action)) gameRef.current?.setInput(action, down);
+    },
   }));
 
   const setInput = (action: AsteroidsAction, down: boolean) =>
@@ -166,4 +170,15 @@ function TouchButton({
       </svg>
     </button>
   );
+}
+
+const ASTEROIDS_ACTIONS: readonly string[] = [
+  "left",
+  "right",
+  "thrust",
+  "fire",
+] satisfies readonly AsteroidsAction[];
+
+function isAsteroidsAction(action: string): action is AsteroidsAction {
+  return ASTEROIDS_ACTIONS.includes(action);
 }
