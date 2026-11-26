@@ -81,9 +81,6 @@ export default function ArkanoidCanvas({
     },
   }));
 
-  const setInput = (action: ArkanoidAction, down: boolean) =>
-    gameRef.current?.setInput(action, down);
-
   return (
     <>
       <canvas
@@ -98,65 +95,7 @@ export default function ArkanoidCanvas({
           touchAction: "none",
         }}
       />
-      <div className="touch-controls touch-arkanoid" aria-hidden="true">
-        <div className="touch-cluster touch-left">
-          <TouchButton
-            action="left"
-            className="touch-rot"
-            onInput={setInput}
-            path="M15 5 7 12l8 7"
-          />
-        </div>
-        <div className="touch-cluster touch-right">
-          <TouchButton
-            action="right"
-            className="touch-rot"
-            onInput={setInput}
-            path="m9 5 8 7-8 7"
-          />
-        </div>
-      </div>
     </>
-  );
-}
-
-function TouchButton({
-  action,
-  className,
-  path,
-  onInput,
-}: {
-  action: ArkanoidAction;
-  className: string;
-  path: string;
-  onInput: (action: ArkanoidAction, down: boolean) => void;
-}) {
-  const release = () => onInput(action, false);
-  return (
-    <button
-      type="button"
-      tabIndex={-1}
-      className={`touch-btn ${className}`}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        onInput(action, true);
-      }}
-      onPointerUp={release}
-      onPointerCancel={release}
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      <svg viewBox="0 0 24 24" width="100%" height="100%">
-        <path
-          d={path}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
   );
 }
 

@@ -18,14 +18,6 @@ interface SnakeCanvasProps extends SnakeCallbacks {
   skin?: string;
 }
 
-// D-pad en cruz; la posición de cada botón vive en CSS (.touch-snake .touch-dp-*).
-const DPAD: { action: SnakeAction; label: string; path: string }[] = [
-  { action: "up", label: "Arriba", path: "M5 15l7-8 7 8" },
-  { action: "left", label: "Izquierda", path: "M15 5 7 12l8 7" },
-  { action: "down", label: "Abajo", path: "M5 9l7 8 7-8" },
-  { action: "right", label: "Derecha", path: "m9 5 8 7-8 7" },
-];
-
 export default function SnakeCanvas({
   ref,
   onScore,
@@ -89,9 +81,6 @@ export default function SnakeCanvas({
     },
   }));
 
-  const setInput = (action: SnakeAction, down: boolean) =>
-    gameRef.current?.setInput(action, down);
-
   return (
     <>
       <canvas
@@ -106,35 +95,6 @@ export default function SnakeCanvas({
           touchAction: "none",
         }}
       />
-      <div className="touch-controls touch-snake" aria-hidden="true">
-        <div className="touch-cluster">
-          {DPAD.map((b) => (
-            <button
-              key={b.action}
-              type="button"
-              tabIndex={-1}
-              aria-label={b.label}
-              className={`touch-btn touch-rot touch-dp-${b.action}`}
-              onPointerDown={(e) => {
-                e.preventDefault();
-                setInput(b.action, true);
-              }}
-              onContextMenu={(e) => e.preventDefault()}
-            >
-              <svg viewBox="0 0 24 24" width="100%" height="100%">
-                <path
-                  d={b.path}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          ))}
-        </div>
-      </div>
     </>
   );
 }
