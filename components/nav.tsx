@@ -16,10 +16,13 @@ export function Nav() {
   const activeAcerca = pathname.startsWith("/acerca");
   const activeAuth = pathname.startsWith("/auth");
   const close = () => setOpen(false);
+  // SPEC 10 — en la vista de juego táctil la nav se oculta (solo CSS, pointer: coarse)
+  const playing = /^\/juegos\/[^/]+\/jugar\/?$/.test(pathname);
+  const playCls = playing ? " is-playing" : "";
 
   return (
     <>
-      <nav className="av-nav">
+      <nav className={"av-nav" + playCls}>
         <Link href="/" className="logo" onClick={close}>
           <div className="logo-mark"></div>
           <div className="logo-text neon-cyan">
@@ -64,21 +67,17 @@ export function Nav() {
       </nav>
 
       <div
-        className={"av-mobile-backdrop" + (open ? " open" : "")}
+        className={"av-mobile-backdrop" + playCls + (open ? " open" : "")}
         onClick={close}
       ></div>
-      <aside className={"av-mobile-panel" + (open ? " open" : "")}>
+      <aside className={"av-mobile-panel" + playCls + (open ? " open" : "")}>
         <div
           className="pixel neon-cyan"
           style={{ fontSize: 11, marginBottom: 16 }}
         >
           MENÚ
         </div>
-        <Link
-          href="/"
-          className={activeInicio ? "active" : ""}
-          onClick={close}
-        >
+        <Link href="/" className={activeInicio ? "active" : ""} onClick={close}>
           Inicio
         </Link>
         <Link

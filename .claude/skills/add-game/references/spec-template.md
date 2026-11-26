@@ -19,7 +19,7 @@
 
 - Port/creación en `lib/games/<id>/` (sin globals; `window`/`document` solo en `start()`).
 - Factory `create<Name>Game(canvas, callbacks, options)` con `start/pause/resume/restart/destroy/setInput`.
-- `components/<id>-canvas.tsx` + controles táctiles.
+- `components/<id>-canvas.tsx` (sin botones en el canvas) + `gamepad` en la entrada del registro (SPEC 10).
 - Registro `lib/games/registry.ts` y refactor de `GamePlayer` (reemplaza `isRocas`; migra `rocas` si el registro no existía).
 - Entrada en `GAMES` (`lib/data.ts`) y migración que amplía `scores_game_id_chk`.
 - HUD/pausa/FIN/modal de la plataforma; sin HUD ni "GAME OVER" en canvas.
@@ -67,7 +67,7 @@ Antes del paso 1: leer `node_modules/next/dist/docs/` (Client Components), el CS
 4. **Registro + GamePlayer.** … Verificar: `/juegos/<id>/jugar` muestra el juego; otros siguen simulados.
 5. **Datos y migración.** `GAMES` + `apply_migration`; `get_advisors`.
 6. **Pausa, FIN, reinicio y guardado.** Verificar fila en `scores` y pestaña del Salón.
-7. **Estilo neón y táctil.** …
+7. **Estilo neón y táctil.** Mapeo `gamepad` (▲▼◀▶ / A / B) en el registro; gestos opcionales en el motor. …
 8. **Cierre.** `npm run build`, `npm run lint`, navegar fuera/volver sin listeners duplicados.
 
 Cada paso deja la app compilable y navegable.
@@ -86,7 +86,7 @@ Cada paso deja la app compilable y navegable.
 - [ ] Insert con `game_id` previo y nuevo pasa el CHECK; `get_advisors` sin problemas nuevos.
 - [ ] Sin listeners duplicados al salir y volver (un solo disparo/acción por pulsación).
 - [ ] Otros juegos (`rocas` y simulados) siguen funcionando.
-- [ ] Controles táctiles solo con `pointer: coarse`.
+- [ ] Gamepad bajo el CRT solo con `pointer: coarse`, mapeo según la spec; ningún botón superpuesto al canvas.
 - [ ] Sin errores de consola ni warnings de hydration.
 - [ ] `references/started-games/<carpeta>/` no fue modificado.
 

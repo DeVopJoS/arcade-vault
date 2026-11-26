@@ -75,10 +75,11 @@ export default function AsteroidsCanvas({
     pause: () => gameRef.current?.pause(),
     resume: () => gameRef.current?.resume(),
     restart: () => gameRef.current?.restart(),
+    // Gamepad genérico (SPEC 10): solo se reenvían acciones válidas del juego
+    setInput: (action: string, down: boolean) => {
+      if (isAsteroidsAction(action)) gameRef.current?.setInput(action, down);
+    },
   }));
-
-  const setInput = (action: AsteroidsAction, down: boolean) =>
-    gameRef.current?.setInput(action, down);
 
   return (
     <>
@@ -93,77 +94,17 @@ export default function AsteroidsCanvas({
           aspectRatio: "4 / 3",
         }}
       />
-      <div className="touch-controls" aria-hidden="true">
-        <div className="touch-cluster touch-left">
-          <TouchButton
-            action="left"
-            className="touch-rot"
-            onInput={setInput}
-            path="M15 5 7 12l8 7"
-          />
-          <TouchButton
-            action="right"
-            className="touch-rot"
-            onInput={setInput}
-            path="m9 5 8 7-8 7"
-          />
-        </div>
-        <div className="touch-cluster touch-right">
-          <TouchButton
-            action="thrust"
-            className="touch-thrust"
-            onInput={setInput}
-            path="M12 4 5 16h14z"
-          />
-          <TouchButton
-            action="fire"
-            className="touch-fire"
-            onInput={setInput}
-            path="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
-          />
-        </div>
-      </div>
     </>
   );
 }
 
-function TouchButton({
-  action,
-  className,
-  path,
-  onInput,
-}: {
-  action: AsteroidsAction;
-  className: string;
-  path: string;
-  onInput: (action: AsteroidsAction, down: boolean) => void;
-}) {
-  const release = () => onInput(action, false);
-  return (
-    <button
-      type="button"
-      tabIndex={-1}
-      className={`touch-btn ${className}`}
-      onPointerDown={(e) => {
-        e.preventDefault();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        onInput(action, true);
-      }}
-      onPointerUp={release}
-      onPointerCancel={release}
-      onContextMenu={(e) => e.preventDefault()}
-    >
-      <svg viewBox="0 0 24 24" width="100%" height="100%">
-        <path
-          d={path}
-          fill={className === "touch-rot" ? "none" : "currentColor"}
-          fillOpacity={0.25}
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </button>
-  );
+const ASTEROIDS_ACTIONS: readonly string[] = [
+  "left",
+  "right",
+  "thrust",
+  "fire",
+] satisfies readonly AsteroidsAction[];
+
+function isAsteroidsAction(action: string): action is AsteroidsAction {
+  return ASTEROIDS_ACTIONS.includes(action);
 }

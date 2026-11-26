@@ -12,7 +12,21 @@ export interface GameCanvasHandle {
   pause(): void;
   resume(): void;
   restart(): void;
+  /** Entrada del gamepad (SPEC 10); acción desconocida → se ignora. */
+  setInput(action: string, down: boolean): void;
 }
+
+export type GamepadSlot = "up" | "down" | "left" | "right" | "a" | "b";
+
+export interface GamepadButton {
+  /** Acción que se pasa a GameCanvasHandle.setInput. */
+  action: string;
+  /** Etiqueta corta bajo A/B (opcional en el D-pad). */
+  label?: string;
+}
+
+/** Slots sin entrada se muestran apagados (deshabilitados). */
+export type GamepadLayout = Partial<Record<GamepadSlot, GamepadButton>>;
 
 export interface GameCanvasProps {
   ref?: Ref<GameCanvasHandle>;
@@ -37,6 +51,8 @@ export interface GameEntry {
   /** Skins disponibles; el selector se muestra solo si existen. */
   skins?: readonly SkinOption[];
   defaultSkin?: string;
+  /** Controles táctiles; sin campo → no se muestra gamepad. */
+  gamepad?: GamepadLayout;
 }
 
 // gameId → juego real. Los ids sin entrada siguen con la simulación de GamePlayer.
@@ -46,23 +62,46 @@ export const GAME_CANVASES: Record<string, GameEntry> = {
     hasLives: true,
     skins: asteroids.SKIN_OPTIONS,
     defaultSkin: asteroids.DEFAULT_SKIN,
+    gamepad: {
+      up: { action: "thrust" },
+      left: { action: "left" },
+      right: { action: "right" },
+      a: { action: "fire", label: "DISPARO" },
+    },
   },
   caida: {
     component: TetrisCanvas,
     hasLives: false,
     skins: tetris.SKIN_OPTIONS,
     defaultSkin: tetris.DEFAULT_SKIN,
+    gamepad: {
+      down: { action: "down" },
+      left: { action: "left" },
+      right: { action: "right" },
+      a: { action: "rotate", label: "ROTAR" },
+      b: { action: "drop", label: "CAÍDA" },
+    },
   },
   "bloque-buster": {
     component: ArkanoidCanvas,
     hasLives: true,
     skins: arkanoid.SKIN_OPTIONS,
     defaultSkin: arkanoid.DEFAULT_SKIN,
+    gamepad: {
+      left: { action: "left" },
+      right: { action: "right" },
+    },
   },
   serpentina: {
     component: SnakeCanvas,
     hasLives: false,
     skins: snake.SKIN_OPTIONS,
     defaultSkin: snake.DEFAULT_SKIN,
+    gamepad: {
+      up: { action: "up" },
+      down: { action: "down" },
+      left: { action: "left" },
+      right: { action: "right" },
+    },
   },
 };

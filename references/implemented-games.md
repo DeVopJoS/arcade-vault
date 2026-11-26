@@ -1,13 +1,15 @@
 # Juegos implementados
 
-Fuentes: `lib/data.ts` (catálogo), `lib/games/registry.ts` (registry), Supabase (`scores`). Actualizado: 2026-11-22.
+Fuentes: `lib/data.ts` (catálogo), `lib/games/registry.ts` (registry), Supabase (`scores`). Actualizado: 2026-11-26.
 
-| id              | Título        | Categoría | Spec | Canvas                            | Lógica                 | Vidas | Touch |
-| --------------- | ------------- | --------- | ---- | --------------------------------- | ---------------------- | ----- | ----- |
-| `rocas`         | ROCAS         | SHOOTER   | 05   | `components/asteroids-canvas.tsx` | `lib/games/asteroids/` | Sí    | —     |
-| `caida`         | CAÍDA         | PUZZLE    | 07   | `components/tetris-canvas.tsx`    | `lib/games/tetris/`    | No    | —     |
-| `bloque-buster` | BLOQUE BUSTER | ARCADE    | 08   | `components/arkanoid-canvas.tsx`  | `lib/games/arkanoid/`  | Sí    | —     |
-| `serpentina`    | SERPENTINA    | ARCADE    | 09   | `components/snake-canvas.tsx`     | `lib/games/snake/`     | No    | D-pad |
+| id              | Título        | Categoría | Spec | Canvas                            | Lógica                 | Vidas | Touch   |
+| --------------- | ------------- | --------- | ---- | --------------------------------- | ---------------------- | ----- | ------- |
+| `rocas`         | ROCAS         | SHOOTER   | 05   | `components/asteroids-canvas.tsx` | `lib/games/asteroids/` | Sí    | Gamepad |
+| `caida`         | CAÍDA         | PUZZLE    | 07   | `components/tetris-canvas.tsx`    | `lib/games/tetris/`    | No    | Gamepad |
+| `bloque-buster` | BLOQUE BUSTER | ARCADE    | 08   | `components/arkanoid-canvas.tsx`  | `lib/games/arkanoid/`  | Sí    | Gamepad |
+| `serpentina`    | SERPENTINA    | ARCADE    | 09   | `components/snake-canvas.tsx`     | `lib/games/snake/`     | No    | Gamepad |
+
+Táctil (SPEC 10): `gamepad` declarado en `lib/games/registry.ts` y pintado por `components/gamepad.tsx` bajo el CRT (solo `pointer: coarse`). Mapeo: Rocas ▲ empuje · ◀▶ rotar · A disparo; Caída ▼◀▶ · A rotar · B caída; Bloque Buster ◀▶ (+ arrastre); Serpentina ▲▼◀▶ (+ swipe).
 
 ## Descripción
 

@@ -1070,6 +1070,11 @@ a {
   color: var(--yellow);
   text-shadow: 0 0 6px rgba(245, 255, 0, 0.5);
 }
+.hud-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 .hud-actions {
   display: flex;
   gap: 10px;
@@ -2910,139 +2915,6 @@ a {
   line-height: 1.6;
 }
 
-/* touch controls (asteroids): solo en dispositivos táctiles */
-.touch-controls {
-  display: none;
-}
-@media (pointer: coarse) {
-  .touch-controls {
-    display: flex;
-    position: absolute;
-    inset: auto 0 0 0;
-    z-index: 4;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 3%;
-    pointer-events: none;
-  }
-  .touch-cluster {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-  }
-  .touch-right {
-    flex-direction: column;
-    align-items: center;
-  }
-  .touch-btn {
-    pointer-events: auto;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-tap-highlight-color: transparent;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    background: rgba(0, 0, 0, 0.45);
-    border: 1px solid currentColor;
-    box-shadow: 0 0 10px color-mix(in srgb, currentColor 45%, transparent);
-    border-radius: 50%;
-    cursor: pointer;
-  }
-  .touch-btn:active {
-    background: color-mix(in srgb, currentColor 30%, transparent);
-  }
-  .touch-btn svg {
-    width: 60%;
-    height: 60%;
-    pointer-events: none;
-  }
-  .touch-rot {
-    width: clamp(52px, 14vw, 72px);
-    aspect-ratio: 1;
-    color: var(--cyan);
-  }
-  .touch-thrust {
-    width: clamp(48px, 13vw, 64px);
-    aspect-ratio: 1;
-    color: var(--yellow);
-  }
-  .touch-fire {
-    width: clamp(68px, 19vw, 96px);
-    aspect-ratio: 1;
-    color: var(--yellow);
-  }
-
-  /* SPEC 07 — Caída: el pozo es vertical y ocupa el centro de la pantalla 4:3,
-     así que los botones se reducen y quedan en los laterales, semitransparentes */
-  .touch-controls.touch-tetris {
-    padding: 2% 1.5%;
-  }
-  .touch-tetris .touch-cluster {
-    gap: 8px;
-  }
-  .touch-tetris .touch-right {
-    gap: 8px;
-  }
-  .touch-tetris .touch-btn {
-    opacity: 0.8;
-  }
-  .touch-tetris .touch-rot {
-    width: clamp(40px, 10.5vw, 56px);
-  }
-  .touch-tetris .touch-thrust {
-    width: clamp(44px, 12vw, 60px);
-  }
-  .touch-tetris .touch-fire {
-    width: clamp(48px, 13vw, 66px);
-  }
-
-  /* SPEC 08 — Bloque Buster: el control principal es arrastrar sobre el canvas;
-     los botones son un apoyo discreto en las esquinas */
-  .touch-controls.touch-arkanoid {
-    padding: 1.5% 2%;
-  }
-  .touch-arkanoid .touch-btn {
-    opacity: 0.55;
-  }
-  .touch-arkanoid .touch-rot {
-    width: clamp(40px, 10vw, 54px);
-  }
-
-  /* SPEC 09 — Serpentina: D-pad en cruz abajo a la derecha; el swipe sobre el canvas
-     es el control principal, así que los botones son discretos */
-  .touch-controls.touch-snake {
-    padding: 1.5% 2%;
-  }
-  .touch-snake .touch-cluster {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-rows: repeat(2, auto);
-    gap: 6px;
-    margin-left: auto;
-  }
-  .touch-snake .touch-btn {
-    opacity: 0.55;
-  }
-  .touch-snake .touch-rot {
-    width: clamp(40px, 10vw, 54px);
-    color: var(--green);
-  }
-  .touch-snake .touch-dp-up {
-    grid-area: 1 / 2;
-  }
-  .touch-snake .touch-dp-left {
-    grid-area: 2 / 1;
-  }
-  .touch-snake .touch-dp-down {
-    grid-area: 2 / 2;
-  }
-  .touch-snake .touch-dp-right {
-    grid-area: 2 / 3;
-  }
-}
-
 /* SPEC 06 — estados del Salón de la Fama (vacío y error) */
 .hall-table .tr.vacant {
   animation: none;
@@ -3084,4 +2956,274 @@ a {
 }
 .hall-state.error .msg {
   color: var(--magenta);
+}
+
+/* SPEC 10 — gamepad táctil bajo el CRT: continúa la carcasa del monitor.
+   D-pad en cruz de una pieza (contorno por drop-shadow) + A/B de arcade. */
+.gamepad {
+  display: none;
+}
+@media (pointer: coarse) {
+  .gamepad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 20px clamp(16px, 6vw, 28px) 24px;
+    border-radius: 18px 18px 32px 32px;
+    background: linear-gradient(180deg, #0c0c13, #050507);
+    box-shadow:
+      0 0 0 6px #1b1b22,
+      0 0 0 7px #2a2a35,
+      0 24px 60px -24px rgba(0, 245, 255, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+  }
+  .gp-btn {
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 60ms ease-out;
+  }
+  .gp-btn:disabled {
+    cursor: default;
+  }
+
+  /* D-pad */
+  .gp-dpad {
+    width: clamp(132px, 40vw, 168px);
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    filter: drop-shadow(0 0 1px var(--cyan))
+      drop-shadow(0 0 8px rgba(0, 245, 255, 0.35));
+  }
+  .gp-dir,
+  .gp-hub {
+    background: #171724;
+  }
+  .gp-dir {
+    color: var(--cyan);
+  }
+  .gp-dir svg {
+    width: 58%;
+    height: 58%;
+    pointer-events: none;
+  }
+  .gp-up {
+    grid-area: 1 / 2;
+    border-radius: 8px 8px 0 0;
+  }
+  .gp-left {
+    grid-area: 2 / 1;
+    border-radius: 8px 0 0 8px;
+  }
+  .gp-right {
+    grid-area: 2 / 3;
+    border-radius: 0 8px 8px 0;
+  }
+  .gp-down {
+    grid-area: 3 / 2;
+    border-radius: 0 0 8px 8px;
+  }
+  .gp-hub {
+    grid-area: 2 / 2;
+    display: grid;
+    place-items: center;
+  }
+  .gp-hub::after {
+    content: "";
+    width: 38%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #0b0b12;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  .gp-dir[data-pressed] {
+    background: color-mix(in srgb, var(--cyan) 28%, #171724);
+  }
+  .gp-dir[data-pressed] svg {
+    filter: drop-shadow(0 0 4px var(--cyan));
+  }
+  .gp-dir:disabled {
+    color: var(--ink-faint);
+  }
+  .gp-dir:disabled svg {
+    opacity: 0.4;
+  }
+
+  /* A / B */
+  .gp-face {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(12px, 4vw, 20px);
+  }
+  .gp-key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .gp-key-b {
+    margin-top: clamp(28px, 9vw, 40px);
+  }
+  .gp-round {
+    width: clamp(58px, 17vw, 74px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    font-family: var(--pixel);
+    font-size: 14px;
+    border: 2px solid currentColor;
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, currentColor 32%, #1a1a26),
+      #0c0c14 72%
+    );
+    box-shadow:
+      0 0 12px color-mix(in srgb, currentColor 45%, transparent),
+      inset 0 -4px 0 rgba(0, 0, 0, 0.55);
+  }
+  .gp-a {
+    color: var(--magenta);
+  }
+  .gp-b {
+    color: var(--yellow);
+  }
+  .gp-round[data-pressed] {
+    transform: translateY(2px) scale(0.96);
+    background: radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, currentColor 55%, #1a1a26),
+      #0c0c14 80%
+    );
+    box-shadow:
+      0 0 18px color-mix(in srgb, currentColor 70%, transparent),
+      inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+  .gp-round:disabled {
+    color: var(--ink-faint);
+    background: #0f0f17;
+    box-shadow: none;
+    opacity: 0.5;
+  }
+  .gp-label {
+    min-height: 8px;
+    font-family: var(--pixel);
+    font-size: 8px;
+    color: var(--ink-dim);
+  }
+
+  /* En pausa / fin todo el mando se apaga un poco */
+  .gamepad[data-disabled] .gp-dpad,
+  .gamepad[data-disabled] .gp-face {
+    opacity: 0.45;
+  }
+}
+@media (pointer: coarse) and (prefers-reduced-motion: reduce) {
+  .gp-btn {
+    transition: none;
+  }
+}
+
+/* SPEC 10 — vista de juego táctil: stats compactas arriba, acciones al footer */
+.player-footer,
+.skin-sheet-bd {
+  display: none;
+}
+@media (pointer: coarse) {
+  .player-hud .hud-actions,
+  .player-hud .skin-picker {
+    display: none;
+  }
+  .player-hud {
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  .hud-stats {
+    gap: 8px 18px;
+  }
+  .player-hud .hud-stat .v {
+    font-size: 13px;
+  }
+
+  .player-footer {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .player-footer .btn {
+    flex: 1;
+    padding: 12px 6px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .skin-sheet-bd {
+    display: flex;
+    align-items: flex-end;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  .skin-sheet {
+    width: 100%;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
+    background: var(--bg-2);
+    border-top: 1px solid var(--cyan);
+    box-shadow: 0 -12px 40px -12px rgba(0, 245, 255, 0.35);
+  }
+  .skin-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .skin-sheet-head h2 {
+    margin: 0;
+    font-family: var(--pixel);
+    font-size: 12px;
+    color: var(--cyan);
+  }
+  .skin-sheet-head .btn {
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+  .skin-sheet-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    border: 1px solid var(--line);
+  }
+  .skin-sheet-opts .skin-opt {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 8px;
+  }
+  .skin-sheet-opts .skin-opt + .skin-opt {
+    border-left: 1px solid var(--line);
+  }
+  .skin-sheet-opts .skin-sw {
+    transform: scale(1.6);
+    margin: 4px 0;
+  }
+}
+
+/* SPEC 10 — sin nav global en la vista de juego táctil (incluye hamburguesa y panel) */
+@media (pointer: coarse) {
+  .av-nav.is-playing,
+  .av-mobile-backdrop.is-playing,
+  .av-mobile-panel.is-playing {
+    display: none;
+  }
 }
