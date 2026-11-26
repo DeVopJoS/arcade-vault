@@ -37,7 +37,7 @@ Identifica: variables globales, listeners en `window/document`, HUD y overlays d
 Usa `references/spec-template.md`. Secciones obligatorias en la spec:
 
 1. **Port TS** en `lib/games/<id>/` con factory `create<Name>Game(canvas, callbacks, options)` y la interfaz común (`start/pause/resume/restart/destroy/setInput`, callbacks `onScore/onLives/onLevel/onGameOver`). Si el juego no tiene vidas/nivel, define qué reporta (p. ej. vidas fijas o `onLives` omitido) y cómo el HUD lo oculta/ajusta.
-2. **Componente** `components/<id>-canvas.tsx` (client, `ref` pause/resume/restart, color vía `getComputedStyle`, controles táctiles `pointer: coarse` reutilizando `.touch-*`).
+2. **Componente** `components/<id>-canvas.tsx` (client, `ref` pause/resume/restart, color vía `getComputedStyle`, `setInput` en el handle; táctil = `gamepad` en el registro, sin botones en el canvas — SPEC 10).
 3. **Registro** `lib/games/registry.ts`: `gameId → componente canvas`. `GamePlayer` reemplaza `isRocas` por lookup; sin entrada → simulación decorativa actual. Si el registro aún no existe, la spec incluye crearlo y migrar `rocas`; si existe, solo registrar el nuevo.
 4. **Datos**: nueva entrada en `GAMES` (portada/`CoverClass` si hace falta) y migración que amplía `scores_game_id_chk` con el nuevo id (SQL concreto basado en el CHECK vigente leído). Ids idénticos en `GAMES`, CHECK y registro.
 5. **Leaderboard**: sin código nuevo; la spec solo verifica guardado (`submitScore`), pestaña del Salón, estado vacío y stats.

@@ -20,14 +20,14 @@
 
 Modelo: `components/asteroids-canvas.tsx`.
 
-- `"use client"`, `ref` con `{ pause, resume, restart }` (`useImperativeHandle`).
+- `"use client"`, `ref` con `{ pause, resume, restart, setInput }` (`useImperativeHandle`). `setInput(action: string, down)` valida con un guard `is<Name>Action` y reenvía al motor (acción desconocida → se ignora).
 - Callbacks en `callbacksRef` para no recrear el juego; juego creado en `useEffect([])`, `destroy()` en cleanup.
 - Color: `getComputedStyle(canvas).getPropertyValue("--<color>")` (CSS var no sirve en canvas).
-- Controles táctiles: botones con `onPointerDown` (+`setPointerCapture`), `onPointerUp/Cancel`, `tabIndex={-1}`; clases `.touch-controls/.touch-btn` en `app/globals.css` (visibles con `@media (pointer: coarse)`, `touch-action: none`).
+- Controles táctiles (SPEC 10): **ningún botón dentro del canvas**. El juego declara `gamepad` en su entrada del registro (`GamepadLayout`: slots `up/down/left/right/a/b` → `{ action, label? }`; slots sin entrada se ven apagados). `GamePlayer` pinta el `<Gamepad>` genérico (`components/gamepad.tsx`) bajo el CRT, solo con `@media (pointer: coarse)`. Gestos sobre el canvas (swipe/arrastre) sí van en el motor.
 
 ## Integración en `components/game-player.tsx`
 
-- HUD, PAUSA/REANUDAR, FIN, modal FIN DEL JUEGO y `submitScore` son de la plataforma.
+- HUD, PAUSA/REANUDAR, FIN, SKIN, modal FIN DEL JUEGO y `submitScore` son de la plataforma. En táctil, PAUSA/FIN/SKIN/SALIR van en `.player-footer` bajo el gamepad y la nav global se oculta (SPEC 10).
 - Hoy: `isRocas = game.id === "rocas"` y `AsteroidsCanvas` condicional; simulación (`setInterval` de puntaje + efecto de nivel) solo si no hay juego real.
 - Objetivo de la spec: registro `lib/games/registry.ts` (`id → componente canvas` con el mismo handle) y lookup en vez de `if` por juego.
 - Conexión: `onScore→setScore`, `onLives→setLives`, `onLevel→setLevel`, `onGameOver→(setScore(final); setOver(true))`. PAUSA/FIN llaman `pause()`; REANUDAR `resume()`; JUGAR DE NUEVO `restart()` + reset de estado. Los botones hacen `blur()` para que Espacio no los reactive.
