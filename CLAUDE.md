@@ -49,6 +49,7 @@ Specs done: 01 MVP screens, 02 home, 03 about+contact (Resend), 04 Supabase conn
 - `/frontend-design`: SIEMPRE usar para diseñar la interfaz de usuario.
 - `/add-game` (`.claude/skills/add-game/`): genera spec `specs/NN-*.md` para un juego nuevo (port desde `references/started-games/` o desde cero) con leaderboard + integración en registry/GamePlayer. Solo escribe la spec; implementar con `/spec-impl`. Refs: `references/integration-checklist.md`, `references/spec-template.md`.
 - Spec workflow: `/spec`, `/spec-impl` (fernando-skills).
+- `/spec-impl-game` (`.claude/skills/spec-impl-game/`): mismo flujo de `/spec-impl` (lee y sigue su SKILL.md, fases 1–4) para specs de juegos (acepta también `specs/game-jam/<id>/spec.md`); al terminar el plan lanza en secuencia `skin-designer <gameId>` → `mobile-porter <gameId>` (nunca en paralelo). No commitea.
 
 ## Agents
 
@@ -58,4 +59,5 @@ Subagentes en `.claude/agents/` (ver con `/agents`).
   - Lee estado real (`references/implemented-games.md`, `lib/data.ts`, registry, `specs/`, `references/started-games/`, Supabase solo SELECT) y propone 2–4 candidatos originales puntuados (/35) + 1 recomendación.
   - Memoria persistente (`memory: project`) en `.claude/agent-memory/game-planner/`: `MEMORY.md` (preferencias del usuario, catálogo) y `suggestions.md` (registro de ideas con estado `sugerido|aceptado|rechazado|en-spec|implementado`). No repite ideas rechazadas. Commitear la memoria.
   - No escribe specs ni código. Flujo: `game-planner` → `/add-game <id>` → `/spec-impl`.
+- `mobile-porter` (`.claude/agents/mobile-porter.md`): adapta un juego implementado al modo móvil de SPEC 10 (gamepad D-pad + A/B bajo el CRT vía `gamepad` en el registro + `setInput` en el handle; sin botones sobre el canvas). Elige mapeo según tipo de juego (tabla en el agente), quita overlays táctiles, verifica (`tsc`, `eslint`, Playwright táctil si hay dev server). Modo `audit` solo reporta. No toca `gamepad.tsx`/`GamePlayer`/`Nav` ni commitea. Memoria en `.claude/agent-memory/mobile-porter/`. Flujo: `/spec-impl` juego → `mobile-porter <id>`.
 - `skin-designer` (`.claude/agents/skin-designer.md`): recibe un `gameId` implementado y valida/verifica sus 3 skins (`clasico` default, `neon`, `retro`) contra el contrato `lib/games/<name>/skins.ts` (`SKINS`, `DEFAULT_SKIN`, sin colores hardcodeados en render, contraste, propagación al canvas). Patrón de referencia: `references/started-games/03-tetris/game.js` (`SKINS` + `drawBlock` + `applySkin`). Corre `tsc`/`eslint`. Reporte en `references/skins-audit.md`; memoria en `.claude/agent-memory/skin-designer/`. Solo audita, no modifica código del juego.
