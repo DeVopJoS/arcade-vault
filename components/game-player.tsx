@@ -89,6 +89,28 @@ export function GamePlayer({ game }: { game: Game }) {
     gameRef.current?.pause();
     setOver(true);
   };
+  // SPEC 10 — panel de skin (táctil): pausa al abrir y, al cerrar, reanuda
+  // solo si el juego no estaba en pausa antes.
+  const [skinOpen, setSkinOpen] = useState(false);
+  const pausedBeforeSkin = useRef(false);
+  const openSkin = (e: MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.blur();
+    pausedBeforeSkin.current = paused;
+    if (!paused) {
+      setPaused(true);
+      gameRef.current?.pause();
+    }
+    setSkinOpen(true);
+  };
+  const closeSkin = () => {
+    setSkinOpen(false);
+    if (!pausedBeforeSkin.current) {
+      setPaused(false);
+      gameRef.current?.resume();
+    }
+  };
+  const exit = () => router.push(`/juegos/${game.id}`);
+
   const restart = () => {
     gameRef.current?.restart();
     setScore(0);
@@ -120,10 +142,34 @@ export function GamePlayer({ game }: { game: Game }) {
     }
   };
 
+  const skinButtons = entry?.skins?.map((o) => (
+    <button
+      key={o.id}
+      type="button"
+      className="skin-opt"
+      aria-pressed={skin === o.id}
+      onClick={(e) => chooseSkin(e, o.id)}
+      style={
+        {
+          "--sw-bg": o.swatch[0],
+          "--sw-body": o.swatch[1],
+          "--sw-head": o.swatch[2],
+        } as CSSProperties
+      }
+    >
+      <span className="skin-sw" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      {o.name}
+    </button>
+  ));
+
   return (
     <div className="av-player fade-in">
       <div className="player-hud">
-        <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <div className="hud-stats">
           <div className="hud-stat">
             <div className="l">Jugador</div>
             <div className="v" style={{ color: "var(--ink)" }}>
@@ -155,29 +201,7 @@ export function GamePlayer({ game }: { game: Game }) {
               role="group"
               aria-labelledby="skin-label"
             >
-              {entry.skins.map((o) => (
-                <button
-                  key={o.id}
-                  type="button"
-                  className="skin-opt"
-                  aria-pressed={skin === o.id}
-                  onClick={(e) => chooseSkin(e, o.id)}
-                  style={
-                    {
-                      "--sw-bg": o.swatch[0],
-                      "--sw-body": o.swatch[1],
-                      "--sw-head": o.swatch[2],
-                    } as CSSProperties
-                  }
-                >
-                  <span className="skin-sw" aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  {o.name}
-                </button>
-              ))}
+              {skinButtons}
             </div>
           </div>
         )}
@@ -188,10 +212,7 @@ export function GamePlayer({ game }: { game: Game }) {
           <button className="btn magenta" onClick={endGame}>
             FIN
           </button>
-          <button
-            className="btn ghost"
-            onClick={() => router.push(`/juegos/${game.id}`)}
-          >
+          <button className="btn ghost" onClick={exit}>
             SALIR
           </button>
         </div>
@@ -220,7 +241,7 @@ export function GamePlayer({ game }: { game: Game }) {
               <div className="player-ship"></div>
             </div>
           )}
-          {paused && (
+          {paused && !skinOpen && (
             <div
               className="crt-content"
               style={{ background: "rgba(0,0,0,0.6)", zIndex: 5 }}
@@ -258,6 +279,49 @@ export function GamePlayer({ game }: { game: Game }) {
           disabled={paused || over}
           onInput={(action, down) => gameRef.current?.setInput(action, down)}
         />
+      )}
+
+      {/* SPEC 10 — footer del reproductor (CSS: solo pointer: coarse) */}
+      <div className="player-footer">
+        <button className="btn yellow" onClick={togglePause}>
+          {paused ? "REANUDAR" : "PAUSA"}
+        </button>
+        <button className="btn magenta" onClick={endGame}>
+          FIN
+        </button>
+        {entry?.skins && (
+          <button
+            className="btn"
+            aria-haspopup="dialog"
+            aria-expanded={skinOpen}
+            onClick={openSkin}
+          >
+            SKIN
+          </button>
+        )}
+        <button className="btn ghost" onClick={exit}>
+          SALIR
+        </button>
+      </div>
+
+      {skinOpen && entry?.skins && (
+        <div className="skin-sheet-bd" onClick={closeSkin}>
+          <div
+            className="skin-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="skin-sheet-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="skin-sheet-head">
+              <h2 id="skin-sheet-title">Skin</h2>
+              <button className="btn ghost" onClick={closeSkin}>
+                CERRAR
+              </button>
+            </div>
+            <div className="skin-sheet-opts">{skinButtons}</div>
+          </div>
+        </div>
       )}
 
       {over && (

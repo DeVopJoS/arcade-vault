@@ -1070,6 +1070,11 @@ a {
   color: var(--yellow);
   text-shadow: 0 0 6px rgba(245, 255, 0, 0.5);
 }
+.hud-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 .hud-actions {
   display: flex;
   gap: 10px;
@@ -3261,5 +3266,97 @@ a {
 @media (pointer: coarse) and (prefers-reduced-motion: reduce) {
   .gp-btn {
     transition: none;
+  }
+}
+
+/* SPEC 10 — vista de juego táctil: stats compactas arriba, acciones al footer */
+.player-footer,
+.skin-sheet-bd {
+  display: none;
+}
+@media (pointer: coarse) {
+  .player-hud .hud-actions,
+  .player-hud .skin-picker {
+    display: none;
+  }
+  .player-hud {
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  .hud-stats {
+    gap: 8px 18px;
+  }
+  .player-hud .hud-stat .v {
+    font-size: 13px;
+  }
+
+  .player-footer {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .player-footer .btn {
+    flex: 1;
+    padding: 12px 6px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+
+  .skin-sheet-bd {
+    display: flex;
+    align-items: flex-end;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  .skin-sheet {
+    width: 100%;
+    padding: 18px 16px calc(20px + env(safe-area-inset-bottom));
+    background: var(--bg-2);
+    border-top: 1px solid var(--cyan);
+    box-shadow: 0 -12px 40px -12px rgba(0, 245, 255, 0.35);
+  }
+  .skin-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .skin-sheet-head h2 {
+    margin: 0;
+    font-family: var(--pixel);
+    font-size: 12px;
+    color: var(--cyan);
+  }
+  .skin-sheet-head .btn {
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+  .skin-sheet-opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    border: 1px solid var(--line);
+  }
+  .skin-sheet-opts .skin-opt {
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 8px;
+  }
+  .skin-sheet-opts .skin-opt + .skin-opt {
+    border-left: 1px solid var(--line);
+  }
+  .skin-sheet-opts .skin-sw {
+    transform: scale(1.6);
+    margin: 4px 0;
+  }
+}
+
+/* SPEC 10 — sin nav global en la vista de juego táctil (incluye hamburguesa y panel) */
+@media (pointer: coarse) {
+  .av-nav.is-playing,
+  .av-mobile-backdrop.is-playing,
+  .av-mobile-panel.is-playing {
+    display: none;
   }
 }
