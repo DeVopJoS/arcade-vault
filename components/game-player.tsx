@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import type { Game } from "@/lib/data";
 import { useSession } from "@/components/session-provider";
+import { Gamepad } from "@/components/gamepad";
 import { submitScore } from "@/lib/scores";
 import { GAME_CANVASES, type GameCanvasHandle } from "@/lib/games/registry";
 
@@ -249,6 +250,15 @@ export function GamePlayer({ game }: { game: Game }) {
           <span>CARGA · 1MB</span>
         </div>
       </div>
+
+      {/* SPEC 10 — mando táctil bajo el CRT (CSS: solo pointer: coarse) */}
+      {entry?.gamepad && (
+        <Gamepad
+          layout={entry.gamepad}
+          disabled={paused || over}
+          onInput={(action, down) => gameRef.current?.setInput(action, down)}
+        />
+      )}
 
       {over && (
         <div className="modal-bd">

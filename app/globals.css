@@ -3085,3 +3085,181 @@ a {
 .hall-state.error .msg {
   color: var(--magenta);
 }
+
+/* SPEC 10 — gamepad táctil bajo el CRT: continúa la carcasa del monitor.
+   D-pad en cruz de una pieza (contorno por drop-shadow) + A/B de arcade. */
+.gamepad {
+  display: none;
+}
+@media (pointer: coarse) {
+  .gamepad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 20px clamp(16px, 6vw, 28px) 24px;
+    border-radius: 18px 18px 32px 32px;
+    background: linear-gradient(180deg, #0c0c13, #050507);
+    box-shadow:
+      0 0 0 6px #1b1b22,
+      0 0 0 7px #2a2a35,
+      0 24px 60px -24px rgba(0, 245, 255, 0.3);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+  }
+  .gp-btn {
+    display: grid;
+    place-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 60ms ease-out;
+  }
+  .gp-btn:disabled {
+    cursor: default;
+  }
+
+  /* D-pad */
+  .gp-dpad {
+    width: clamp(132px, 40vw, 168px);
+    aspect-ratio: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    filter: drop-shadow(0 0 1px var(--cyan))
+      drop-shadow(0 0 8px rgba(0, 245, 255, 0.35));
+  }
+  .gp-dir,
+  .gp-hub {
+    background: #171724;
+  }
+  .gp-dir {
+    color: var(--cyan);
+  }
+  .gp-dir svg {
+    width: 58%;
+    height: 58%;
+    pointer-events: none;
+  }
+  .gp-up {
+    grid-area: 1 / 2;
+    border-radius: 8px 8px 0 0;
+  }
+  .gp-left {
+    grid-area: 2 / 1;
+    border-radius: 8px 0 0 8px;
+  }
+  .gp-right {
+    grid-area: 2 / 3;
+    border-radius: 0 8px 8px 0;
+  }
+  .gp-down {
+    grid-area: 3 / 2;
+    border-radius: 0 0 8px 8px;
+  }
+  .gp-hub {
+    grid-area: 2 / 2;
+    display: grid;
+    place-items: center;
+  }
+  .gp-hub::after {
+    content: "";
+    width: 38%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #0b0b12;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  .gp-dir[data-pressed] {
+    background: color-mix(in srgb, var(--cyan) 28%, #171724);
+  }
+  .gp-dir[data-pressed] svg {
+    filter: drop-shadow(0 0 4px var(--cyan));
+  }
+  .gp-dir:disabled {
+    color: var(--ink-faint);
+  }
+  .gp-dir:disabled svg {
+    opacity: 0.4;
+  }
+
+  /* A / B */
+  .gp-face {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(12px, 4vw, 20px);
+  }
+  .gp-key {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .gp-key-b {
+    margin-top: clamp(28px, 9vw, 40px);
+  }
+  .gp-round {
+    width: clamp(58px, 17vw, 74px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    font-family: var(--pixel);
+    font-size: 14px;
+    border: 2px solid currentColor;
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, currentColor 32%, #1a1a26),
+      #0c0c14 72%
+    );
+    box-shadow:
+      0 0 12px color-mix(in srgb, currentColor 45%, transparent),
+      inset 0 -4px 0 rgba(0, 0, 0, 0.55);
+  }
+  .gp-a {
+    color: var(--magenta);
+  }
+  .gp-b {
+    color: var(--yellow);
+  }
+  .gp-round[data-pressed] {
+    transform: translateY(2px) scale(0.96);
+    background: radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, currentColor 55%, #1a1a26),
+      #0c0c14 80%
+    );
+    box-shadow:
+      0 0 18px color-mix(in srgb, currentColor 70%, transparent),
+      inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+  .gp-round:disabled {
+    color: var(--ink-faint);
+    background: #0f0f17;
+    box-shadow: none;
+    opacity: 0.5;
+  }
+  .gp-label {
+    min-height: 8px;
+    font-family: var(--pixel);
+    font-size: 8px;
+    color: var(--ink-dim);
+  }
+
+  /* En pausa / fin todo el mando se apaga un poco */
+  .gamepad[data-disabled] .gp-dpad,
+  .gamepad[data-disabled] .gp-face {
+    opacity: 0.45;
+  }
+}
+@media (pointer: coarse) and (prefers-reduced-motion: reduce) {
+  .gp-btn {
+    transition: none;
+  }
+}
