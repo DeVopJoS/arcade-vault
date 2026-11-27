@@ -1,10 +1,12 @@
 import type { ComponentType, Ref } from "react";
 import ArkanoidCanvas from "@/components/arkanoid-canvas";
 import AsteroidsCanvas from "@/components/asteroids-canvas";
+import RanariaCanvas from "@/components/ranaria-canvas";
 import SnakeCanvas from "@/components/snake-canvas";
 import TetrisCanvas from "@/components/tetris-canvas";
 import * as arkanoid from "@/lib/games/arkanoid";
 import * as asteroids from "@/lib/games/asteroids";
+import * as ranaria from "@/lib/games/ranaria";
 import * as snake from "@/lib/games/snake";
 import * as tetris from "@/lib/games/tetris";
 
@@ -97,6 +99,18 @@ export const GAME_CANVASES: Record<string, GameEntry> = {
     hasLives: false,
     skins: snake.SKIN_OPTIONS,
     defaultSkin: snake.DEFAULT_SKIN,
+    gamepad: {
+      up: { action: "up" },
+      down: { action: "down" },
+      left: { action: "left" },
+      right: { action: "right" },
+    },
+  },
+  ranaria: {
+    component: RanariaCanvas,
+    hasLives: true,
+    skins: ranaria.SKIN_OPTIONS,
+    defaultSkin: ranaria.DEFAULT_SKIN,
     gamepad: {
       up: { action: "up" },
       down: { action: "down" },

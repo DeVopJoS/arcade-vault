@@ -69,6 +69,17 @@ export const GAMES: Game[] = [
     best: 0,
     plays: "0",
   },
+  {
+    id: "ranaria",
+    title: "RANARIA",
+    short: "Cruza la carretera y el río sin convertirte en papilla.",
+    long: "Guía a tu rana a través de una carretera repleta de coches y un río de troncos y tortugas que se sumergen. Llena las cinco bocas del otro lado para completar la ronda; cada nivel acelera el tráfico y acorta el tiempo. Tres vidas y mucho asfalto por delante.",
+    cat: "ARCADE",
+    cover: "cover-rana",
+    color: "green",
+    best: 0,
+    plays: "0",
+  },
 ];
 
 export const CATS: ("TODOS" | Category)[] = [

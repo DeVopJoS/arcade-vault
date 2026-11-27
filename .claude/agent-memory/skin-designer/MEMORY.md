@@ -16,10 +16,11 @@
 - 2026-11-24 · caida · ✅ · 0 bloqueantes, 1 menor (swatch a mano)
 - 2026-11-24 · bloque-buster · ✅ · 0 bloqueantes, 1 menor (swatch a mano)
 - 2026-11-24 · serpentina · ✅ · 0 fallos (3ª audit; fixes #1-#3 verificados)
+- 2026-11-26 · ranaria · ✅ · 0 bloqueantes, 1 menor (neon hedge=goal mismo color; juego nuevo, sin main para regresión)
 
 ## Notas de implementación vistas
 
 - serpentina estableció patrón genérico: `GameEntry.skins/defaultSkin` + `GameCanvasProps.skin?: string` en registry, selector en `game-player.tsx` con botones `aria-pressed` (no `<select>`, para no robar flechas/espacio). Tratado como equivalente válido de `#skin-select` (propuesto por agente principal, pendiente confirmación del usuario).
 - Clasico ya no lee CSS vars (`--yellow/--magenta/--cyan`): literales iguales en skins.ts; no-regresión = comparar con valor de la var en `app/globals.css`.
-- Único texto en canvas: tetris "SIGUIENTE" (clasico `#ff006e` sobre fondo CSS, 5.15 vs `#0a0a0f`).
+- Único texto en canvas: tetris "SIGUIENTE" (clasico `#ff006e` sobre fondo CSS, 5.15 vs `#0a0a0f`). Ranaria: HUD texto `hudText` sobre fila 13 (`safe`), ≥7.17 en las 3.
 - Prettier `--check` da warn en todo por CRLF en Windows; comparar con `tr -d '\r'` para ver diffs reales.
