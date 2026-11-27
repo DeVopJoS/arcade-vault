@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Arcade Vault: online game platform where users play and compete for points. UI/copy in Spanish. Development is spec-driven: `specs/NN-*.md` (via `/spec`, `/spec-impl` from `Klerith/fernando-skills`: `npx skills@latest add Klerith/fernando-skills`). `specs/.spec-config.yml`: `AutoCreateBranch: true` (`/spec-impl` creates branch `spec-NN-slug`).
 
-Specs done: 01 MVP screens, 02 home, 03 about+contact (Resend), 04 Supabase connection, 05 Asteroids, 06 Hall of Fame (Supabase), 07 Tetris, 08 Arkanoid, 09 Snake.
+Specs done: 01 MVP screens, 02 home, 03 about+contact (Resend), 04 Supabase connection, 05 Asteroids, 06 Hall of Fame (Supabase), 07 Tetris, 08 Arkanoid, 09 Snake, 10 gamepad móvil, game-jam frogger → Ranaria (`specs/game-jam/frogger/01-frogger-core.md`).
 
 ## Commands
 
@@ -31,9 +31,9 @@ Specs done: 01 MVP screens, 02 home, 03 about+contact (Resend), 04 Supabase conn
 
 ## Games architecture
 
-- Catalog: `lib/data.ts` (mock `Game` list: rocas, caida, bloque-buster, serpentina).
+- Catalog: `lib/data.ts` (mock `Game` list: rocas, caida, bloque-buster, serpentina, ranaria).
 - Registry: `lib/games/registry.ts` maps `gameId` → `{ component, hasLives }`. Ids without entry fall back to score simulation in `components/game-player.tsx`. Canvas contract: `GameCanvasProps` (`onScore/onLives/onLevel/onGameOver`) + `GameCanvasHandle` (`pause/resume/restart`).
-- Each game: `components/<name>-canvas.tsx` (React wrapper) + `lib/games/<name>/` (`entities.ts`, `index.ts`, `utils.ts`, plus `board/pieces/levels/sprites` as needed). Games: `asteroids` (rocas), `tetris` (caida), `arkanoid` (bloque-buster), `snake` (serpentina; has on-screen D-pad for touch).
+- Each game: `components/<name>-canvas.tsx` (React wrapper) + `lib/games/<name>/` (`entities.ts`, `index.ts`, `utils.ts`, plus `board/pieces/levels/sprites` as needed). Games: `asteroids` (rocas), `tetris` (caida), `arkanoid` (bloque-buster), `snake` (serpentina), `ranaria` (ranaria; skins in `skins.ts`, canvas 640×560 aspect 8:7).
 - Scores: `lib/scores.ts` (`submitScore`, `fetchLeaderboard`, `fetchGameStats`) via browser Supabase client. Tables/views: `scores` (insert), `scores_best` (leaderboard), `game_stats` (plays/players/best). Name uppercased, max 10 chars.
 - `components/session-provider.tsx`: client-only fake session in localStorage (`av_user`, `av_scores`) — not Supabase Auth.
 - Supabase clients: `lib/supabase/client.ts` (browser), `lib/supabase/server.ts` (SSR, cookies).
