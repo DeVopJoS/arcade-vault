@@ -106,11 +106,16 @@ export const GAME_CANVASES: Record<string, GameEntry> = {
       right: { action: "right" },
     },
   },
-  // gamepad: lo agrega mobile-porter (SPEC 10)
   ranaria: {
     component: RanariaCanvas,
     hasLives: true,
     skins: ranaria.SKIN_OPTIONS,
     defaultSkin: ranaria.DEFAULT_SKIN,
+    gamepad: {
+      up: { action: "up" },
+      down: { action: "down" },
+      left: { action: "left" },
+      right: { action: "right" },
+    },
   },
 };

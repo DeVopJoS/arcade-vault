@@ -14,9 +14,11 @@
 - `caida` (puzzle piezas): ▼ down · ◀▶ left/right · A rotate `ROTAR` · B drop `CAÍDA`
 - `bloque-buster` (paleta): ◀▶ left/right (+ arrastre en canvas)
 - `serpentina` (rejilla 4 dir.): ▲▼◀▶ up/down/left/right (+ swipe)
+- `ranaria` (rana / cruce carriles): ▲▼◀▶ up/down/left/right; motor ignora `down=false` (1 salto por pulsación)
 
 ## Ports
 
 <!-- <YYYY-MM-DD> · <gameId> · <tipo> · <port|audit> · <estado> -->
 
 - 2026-11-26 · rocas, caida, bloque-buster, serpentina · — · port (SPEC 10) · ✅
+- 2026-11-26 · ranaria · rana/cruce carriles · port · ✅

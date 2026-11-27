@@ -43,14 +43,14 @@ export const ROUND_SCORE = 200;
 /** Altura de la barra de tiempo (px) en el borde superior de la fila 0. */
 export const TIME_BAR_H = 6;
 
-/** Segundos por trayecto: 15 − (nivel − 1), mínimo 8. */
+/** Segundos por trayecto: 30 − 2·(nivel − 1), mínimo 16. */
 export function timeLimitFor(level: number): number {
-  return Math.max(8, 15 - (level - 1));
+  return Math.max(16, 30 - 2 * (level - 1));
 }
 
-/** Multiplicador de velocidad: ×1.15 por nivel. */
+/** Multiplicador de velocidad: ×1.12 por nivel, tope ×2.2. */
 export function speedFactorFor(level: number): number {
-  return 1.15 ** (level - 1);
+  return Math.min(2.2, 1.12 ** (level - 1));
 }
 
 export type Direction = "up" | "down" | "left" | "right";

@@ -32,8 +32,8 @@ interface LaneTemplate {
   dir: 1 | -1;
 }
 
-// Carretera: 1.5–4 px/frame, sentidos alternos, huecos ≥ 2 celdas.
-// Río: 1–3 px/frame; filas 6 y 3 son tortugas (grupos de 2–3), resto troncos.
+// Carretera: 0.8–2 px/frame, sentidos alternos, huecos ≥ 3 celdas.
+// Río: 0.6–1.4 px/frame; filas 6 y 3 son tortugas (grupos de 2–3), resto troncos.
 const TEMPLATES: readonly LaneTemplate[] = [
   // Río
   {
@@ -42,7 +42,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "log",
     widths: [4, 3],
     gap: 2,
-    speed: 2,
+    speed: 1,
     dir: -1,
   },
   {
@@ -51,7 +51,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "log",
     widths: [2, 3],
     gap: 2,
-    speed: 1,
+    speed: 0.6,
     dir: 1,
   },
   {
@@ -60,7 +60,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "turtle",
     widths: [2],
     gap: 2,
-    speed: 1.8,
+    speed: 0.9,
     dir: -1,
   },
   {
@@ -69,7 +69,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "log",
     widths: [4],
     gap: 3,
-    speed: 2.5,
+    speed: 1.4,
     dir: 1,
   },
   {
@@ -78,7 +78,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "log",
     widths: [3],
     gap: 3,
-    speed: 1.5,
+    speed: 0.8,
     dir: -1,
   },
   {
@@ -87,7 +87,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "turtle",
     widths: [3],
     gap: 2,
-    speed: 1.2,
+    speed: 0.7,
     dir: 1,
   },
   // Carretera
@@ -97,17 +97,17 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "truck",
     widths: [3, 2],
     gap: 5,
-    speed: 2.5,
+    speed: 1.2,
     dir: -1,
   },
-  { row: 9, kind: "road", type: "car", widths: [1], gap: 6, speed: 4, dir: 1 },
+  { row: 9, kind: "road", type: "car", widths: [1], gap: 6, speed: 2, dir: 1 },
   {
     row: 10,
     kind: "road",
     type: "truck",
     widths: [2],
     gap: 4,
-    speed: 1.8,
+    speed: 1,
     dir: -1,
   },
   {
@@ -116,7 +116,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "car",
     widths: [1],
     gap: 4,
-    speed: 2.2,
+    speed: 1.4,
     dir: 1,
   },
   {
@@ -125,7 +125,7 @@ const TEMPLATES: readonly LaneTemplate[] = [
     type: "car",
     widths: [1],
     gap: 3,
-    speed: 1.5,
+    speed: 0.8,
     dir: -1,
   },
 ];

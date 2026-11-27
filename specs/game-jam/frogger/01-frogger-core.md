@@ -31,8 +31,8 @@
 - Muerte: (a) vehículo, (b) agua, (c) tortuga que se sumerge bajo la rana, (d) arrastrada fuera de los bordes laterales en el río, (e) temporizador a 0, (f) boca ocupada / seto. Tras morir: parpadeo de 600 ms (sin partículas) y reaparición en la base con el temporizador reiniciado.
 - Vidas: 3. Cada muerte emite `onLives(lives)` una vez; al llegar a 0 se emite `onLives(0)` y luego `onGameOver(score)`.
 - Puntuación: +10 por cada fila alcanzada por primera vez en el trayecto actual (se reinicia en cada reaparición); +50 al ocupar boca; + bonus `segundos_restantes × 10` al ocupar boca; +200 al completar la ronda.
-- Temporizador por trayecto: `max(8, 15 − (level − 1))` segundos.
-- Nivel: cada ronda completada sube `level` (+1), emite `onLevel(level)`, reconstruye carriles con velocidades ×1.15 por nivel.
+- Temporizador por trayecto: `max(16, 30 − 2·(level − 1))` segundos (30 s en nivel 1).
+- Nivel: cada ronda completada sube `level` (+1), emite `onLevel(level)`, reconstruye carriles con velocidades ×1.12 por nivel (tope ×2.2).
 - HUD interno (doble HUD, como los demás juegos): barra de tiempo de 6 px en el borde superior de la fila 0 (verde → amarillo → rojo); score (izquierda), nivel (centro) y vidas como iconos de rana (derecha) en la fila 13, sin tapar la casilla central de inicio.
 - Pausa: solo vía `GameCanvasHandle.pause/resume` (botón PAUSA del `GamePlayer`). P / Esc no pausan el canvas.
 - 3 skins (`clasico` default, `neon`, `retro`) en `lib/games/ranaria/skins.ts` con el contrato de skins del repo (`SKINS`, `DEFAULT_SKIN`, `SKIN_OPTIONS`, `isSkinId`; el motor no pinta colores propios).
@@ -112,15 +112,17 @@ export type RanariaAction = "up" | "down" | "left" | "right";
      MAX_DT = 50;
    export const TURTLE_UP_MS = 3000,
      TURTLE_DOWN_MS = 1500;
-   export const timeLimitFor = (level: number) => Math.max(8, 15 - (level - 1)); // s
-   export const speedFactorFor = (level: number) => 1.15 ** (level - 1);
+   export const timeLimitFor = (level: number) =>
+     Math.max(16, 30 - 2 * (level - 1)); // s
+   export const speedFactorFor = (level: number) =>
+     Math.min(2.2, 1.12 ** (level - 1));
    ```
 
    Tipos: `Direction`, `Lane { row, kind: "road" | "river", speed, dir: 1 | -1, span, entities }`, `Entity { col, width, type: "car" | "truck" | "log" | "turtle", variant, phase? }`, `Frog { col, row, animating, animT, fromCol, fromRow, targetCol, targetRow, facing }`.
 
 3. **Carriles** — `entities.ts`, `buildLanes(level): Lane[]`:
-   - Carretera (filas 8–12): velocidades base 1.5–4 px/frame (a 60 fps) × `speedFactorFor(level)`, sentidos alternos, ≥2 vehículos por carril con huecos ≥2 celdas.
-   - Río (filas 1–6): velocidades base 1–3 px/frame × factor; 4 carriles de troncos (2–4 celdas, huecos ≥1) y 2 de tortugas (grupos de 2–3) con desfase de fase por grupo.
+   - Carretera (filas 8–12): velocidades base 0.8–2 px/frame (a 60 fps) × `speedFactorFor(level)`, sentidos alternos, ≥2 vehículos por carril con huecos ≥2 celdas.
+   - Río (filas 1–6): velocidades base 0.6–1.4 px/frame × factor; 4 carriles de troncos (2–4 celdas, huecos ≥1) y 2 de tortugas (grupos de 2–3) con desfase de fase por grupo.
    - Loop: cada carril tiene `span = max(COLS + anchoMáx, suma de entidades + huecos)`; al salir por un lado la entidad se reinserta por el opuesto restando/sumando `span`, preservando los huecos.
    - `updateLanes(lanes, dt)`: `entity.col += speed * dir * dt / 16 / CELL` (px/frame → celdas) + avance del ciclo de tortugas.
      Verificación: cada carril con ≥2 entidades y huecos atravesables.
@@ -188,3 +190,4 @@ export type RanariaAction = "up" | "down" | "left" | "right";
 - **Sí: 3 skins con el contrato existente** — requisito de plataforma (selector de skin en `GamePlayer`, auditoría `skin-designer`).
 - **Sí: Puntos por fila nueva por trayecto** (no por ronda) — si fuese por ronda, tras la primera boca los siguientes trayectos no puntuarían avance.
 - **No: Movimiento continuo, cocodrilo, mosca, partículas, `CanvasGame` genérico, RLS, Realtime.**
+- **Ajuste de dificultad (2026-11-26, tras playtest):** con 15 s y 1.5–4 px/frame el nivel 1 era casi imposible de completar. Se sube el temporizador a 30 s (−2 s/nivel, mín. 16), se bajan las velocidades base (carretera 0.8–2, río 0.6–1.4 px/frame) y la progresión pasa a ×1.12/nivel con tope ×2.2.

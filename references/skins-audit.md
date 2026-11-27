@@ -80,3 +80,21 @@ Fixes previos verificados: #1 blur fruta neón `alpha < 0.5 ? 8 : 16` (`skins.ts
 ### Faltantes / acciones
 
 Ninguno. (info) `skin?: string` en registry/canvas en vez de `SkinId`: aceptado por registry genérico, validado con `isSkinId`.
+
+## RANARIA (`ranaria`) — ✅ — 2026-11-26
+
+Juego nuevo (rama `spec-frogger`, no existe en main): no-regresión de `clasico` evaluada contra el look del spec (carretera negra, río azul, franjas verdes, bocas verde oscuro + borde dorado).
+
+| Check               | clasico | neon | retro | Nota                                                                                                                                                  |
+| ------------------- | ------- | ---- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Definida en SKINS   | ✅      | ✅   | ✅    | `SKINS: Record<SkinId, RanariaSkin>` (`skins.ts:662`) vía fábrica `makeSkin(name, mode, boardBg, colors)`; `DEFAULT_SKIN = "clasico"`                 |
+| Tokens completos    | ✅      | ✅   | ✅    | `name/colors/boardBg` + `drawBoard/drawGoalFrog/drawVehicle/drawLog/drawTurtles/drawFrog(alpha?)/drawHud`; `RanariaSkinColors` completo en las 3      |
+| Identidad visual    | ✅      | ⚠️   | ✅    | neon: `#000`, relleno 0.55 + stroke, glow = color, blur 6 si alpha<0.5; retro: `#1a1a2e`, desaturada, líneas cada 4 px, sin glow. Ver acción 1 (neon) |
+| Contraste HUD ≥ 4.5 | ✅      | ✅   | ✅    | `hudText` sobre fila 13 (`safe`): clasico 10.20 · neon 16.64 (`#00ff88`@0.14 sobre negro) · retro 7.17 (8.68 en línea de textura)                     |
+| Assets              | ✅      | ✅   | ✅    | N/A: todo vectorial                                                                                                                                   |
+
+Global: skins.ts ✅ · DEFAULT_SKIN ✅ · delegación drawX ✅ (0 literales fuera de skins.ts; `utils.ts:139` `withAlpha` solo convierte) · contexto limpio ✅ (`paint`/`line`/`text` con save/restore) · applySkin sin reinicio ✅ (`index.ts:422`, fallback DEFAULT_SKIN, redibuja en pausa) · localStorage `av-skin-ranaria` ✅ (`game-player.tsx:38`) · selector UI ✅ (`SKIN_OPTIONS` derivado de `SKINS`) · tsc ✅ · eslint ✅
+
+### Faltantes / acciones
+
+1. ✅ Corregido (hedge neon → `#b967ff`). (menor, legibilidad) `lib/games/ranaria/skins.ts:608-610` — en neon `hedge` y `goal` son ambos `#00ff88` (zona a 0.14): boca vs seto (muerte) solo se distingue por el borde `goalBorder`. → dar a `hedge` otro tono (p. ej. `#b967ff` o `goal: "#00f5ff"`) para diferenciar relleno.
