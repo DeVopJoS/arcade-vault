@@ -2,10 +2,16 @@
 import {
   CELL,
   COLS,
+  GOAL_COLS,
+  GOAL_WIDTH,
+  isRiverRow,
+  isRoadRow,
+  isSubmerged,
   speedFactorFor,
   TURTLE_CYCLE_MS,
   type Entity,
   type EntityType,
+  type Frog,
   type Lane,
   type LaneKind,
 } from "./utils";
@@ -210,4 +216,41 @@ export function updateLanes(lanes: Lane[], dt: number): void {
 
 export function laneAt(lanes: readonly Lane[], row: number): Lane | null {
   return lanes.find((l) => l.row === row) ?? null;
+}
+
+// ---------- Colisiones y soporte ----------
+// Se usa el centro de la rana (col + 0.5). Las entidades viven en
+// [-maxW, span - maxW), así que la parte visible nunca necesita wrap extra.
+
+function covers(e: Entity, x: number): boolean {
+  return x >= e.col && x < e.col + e.width;
+}
+
+/** ¿Algún vehículo de la fila de la rana cubre su centro? */
+export function hitsVehicle(frog: Frog, lanes: readonly Lane[]): boolean {
+  if (!isRoadRow(frog.row)) return false;
+  const lane = laneAt(lanes, frog.row);
+  if (!lane) return false;
+  const x = frog.col + 0.5;
+  return lane.entities.some((e) => covers(e, x));
+}
+
+/**
+ * Tronco o tortuga a flote bajo el centro de la rana en su fila de río, o
+ * null (agua o tortuga sumergida = sin apoyo).
+ */
+export function getSupport(frog: Frog, lanes: readonly Lane[]): Entity | null {
+  if (!isRiverRow(frog.row)) return null;
+  const lane = laneAt(lanes, frog.row);
+  if (!lane) return null;
+  const x = frog.col + 0.5;
+  const e = lane.entities.find((en) => covers(en, x));
+  if (!e || isSubmerged(e)) return null;
+  return e;
+}
+
+/** Índice de la boca destino que contiene el centro de `col`, o -1 (seto). */
+export function goalAt(col: number): number {
+  const x = col + 0.5;
+  return GOAL_COLS.findIndex((g) => x >= g && x < g + GOAL_WIDTH);
 }
